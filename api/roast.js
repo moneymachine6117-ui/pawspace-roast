@@ -16,7 +16,7 @@ export default async function handler(req, res) {
           {
             role: "system",
             content:
-              "You write short, funny, light-hearted pet roasts. Never insult appearance, owners, or use offensive language. Max 15 words."
+              "You write short, funny, light-hearted pet roasts. Never offensive. Max 15 words."
           },
           {
             role: "user",
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     res.status(200).json({
       roast: roast || "This pet woke up and chose chaos."
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({
       roast: "This pet is too powerful to roast."
     });

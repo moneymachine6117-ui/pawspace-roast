@@ -129,7 +129,9 @@
   <!-- html2canvas -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
+  <!-- APP SCRIPT -->
   <script>
+    /* ------------------ DATA ------------------ */
     const fallbackRoasts = [
       "Main character energy. Zero apologies.",
       "Cute face. Criminal intentions.",
@@ -138,6 +140,7 @@
       "Looks innocent. Causes chaos."
     ];
 
+    /* ------------------ ELEMENTS ------------------ */
     const upload = document.getElementById("upload");
     const petImage = document.getElementById("petImage");
     const card = document.getElementById("card");
@@ -146,12 +149,14 @@
     const downloadBtn = document.getElementById("downloadBtn");
     const reportBtn = document.getElementById("reportBtn");
 
+    /* ------------------ IMAGE PREVIEW ------------------ */
     upload.addEventListener("change", () => {
       const file = upload.files[0];
       if (!file) return;
       petImage.src = URL.createObjectURL(file);
     });
 
+    /* ------------------ FETCH ROAST ------------------ */
     async function getRoast() {
       try {
         const res = await fetch("/api/roast", { method: "POST" });
@@ -162,6 +167,7 @@
       }
     }
 
+    /* ------------------ GENERATE ROAST ------------------ */
     generateBtn.addEventListener("click", async () => {
       if (!petImage.src) {
         alert("Upload a pet photo first 🐶");
@@ -177,6 +183,7 @@
       roastText.textContent = roast;
     });
 
+    /* ------------------ DOWNLOAD CARD ------------------ */
     downloadBtn.addEventListener("click", async () => {
       await new Promise(resolve => setTimeout(resolve, 400));
 
@@ -192,6 +199,7 @@
       });
     });
 
+    /* ------------------ REPORT ------------------ */
     reportBtn.addEventListener("click", () => {
       alert("Thanks for reporting. This image will be reviewed.");
     });
