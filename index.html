@@ -27,8 +27,14 @@
     }
 
     input[type="file"] {
-      margin-bottom: 16px;
+      margin-bottom: 6px;
       color: white;
+    }
+
+    .disclaimer {
+      font-size: 12px;
+      opacity: 0.6;
+      margin-bottom: 16px;
     }
 
     .card {
@@ -83,6 +89,12 @@
       background: white;
       color: black;
     }
+
+    .secondary {
+      background: transparent;
+      color: #aaa;
+      border: 1px solid #333;
+    }
   </style>
 </head>
 
@@ -91,6 +103,9 @@
     <h2>Upload your pet 🐾</h2>
 
     <input type="file" accept="image/*" id="upload" />
+    <div class="disclaimer">
+      Upload only pet images. Illegal or inappropriate content may be removed.
+    </div>
 
     <div class="card" id="card">
       <div class="image-wrap">
@@ -105,6 +120,9 @@
     <button class="primary" id="generateBtn">Generate Roast</button>
     <button class="primary" id="downloadBtn" style="display:none;">
       Download Card
+    </button>
+    <button class="secondary" id="reportBtn" style="display:none;">
+      Report Image
     </button>
   </div>
 
@@ -126,6 +144,7 @@
     const roastText = document.getElementById("roastText");
     const generateBtn = document.getElementById("generateBtn");
     const downloadBtn = document.getElementById("downloadBtn");
+    const reportBtn = document.getElementById("reportBtn");
 
     upload.addEventListener("change", () => {
       const file = upload.files[0];
@@ -152,13 +171,13 @@
       roastText.textContent = "Roasting...";
       card.style.display = "block";
       downloadBtn.style.display = "block";
+      reportBtn.style.display = "block";
 
       const roast = await getRoast();
       roastText.textContent = roast;
     });
 
     downloadBtn.addEventListener("click", async () => {
-      // Ensure text + image are fully rendered
       await new Promise(resolve => setTimeout(resolve, 400));
 
       html2canvas(card, {
@@ -171,6 +190,10 @@
         link.href = canvas.toDataURL("image/png");
         link.click();
       });
+    });
+
+    reportBtn.addEventListener("click", () => {
+      alert("Thanks for reporting. This image will be reviewed.");
     });
   </script>
 </body>
