@@ -22,6 +22,10 @@
       text-align: center;
     }
 
+    h2 {
+      margin-bottom: 12px;
+    }
+
     input[type="file"] {
       margin-bottom: 16px;
       color: white;
@@ -37,14 +41,15 @@
 
     .image-wrap {
       width: 100%;
-      aspect-ratio: 1/1;
+      aspect-ratio: 1 / 1;
       background: #1a1a24;
     }
 
-    img {
+    .image-wrap img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
     }
 
     .content {
@@ -55,22 +60,28 @@
       font-size: 22px;
       font-weight: 800;
       line-height: 1.25;
+      margin-bottom: 10px;
     }
 
     .footer {
       font-size: 12px;
-      opacity: 0.6;
-      margin-top: 12px;
+      opacity: 0.7;
+      letter-spacing: 1px;
     }
 
     button {
-      width: 100%;
       margin-top: 14px;
       padding: 12px;
       border-radius: 14px;
       border: none;
       font-weight: 700;
       cursor: pointer;
+      width: 100%;
+    }
+
+    .primary {
+      background: white;
+      color: black;
     }
   </style>
 </head>
@@ -78,11 +89,12 @@
 <body>
   <div class="container">
     <h2>Upload your pet 🐾</h2>
-    <input type="file" id="upload" accept="image/*" />
+
+    <input type="file" accept="image/*" id="upload" />
 
     <div class="card" id="card">
       <div class="image-wrap">
-        <img id="petImage" />
+        <img id="petImage" crossorigin="anonymous" />
       </div>
       <div class="content">
         <div class="roast" id="roastText"></div>
@@ -90,10 +102,13 @@
       </div>
     </div>
 
-    <button id="generateBtn">Generate Roast</button>
-    <button id="downloadBtn" style="display:none;">Download Card</button>
+    <button class="primary" id="generateBtn">Generate Roast</button>
+    <button class="primary" id="downloadBtn" style="display:none;">
+      Download Card
+    </button>
   </div>
 
+  <!-- html2canvas -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
@@ -113,7 +128,9 @@
     const downloadBtn = document.getElementById("downloadBtn");
 
     upload.addEventListener("change", () => {
-      petImage.src = URL.createObjectURL(upload.files[0]);
+      const file = upload.files[0];
+      if (!file) return;
+      petImage.src = URL.createObjectURL(file);
     });
 
     async function getRoast() {
@@ -128,7 +145,7 @@
 
     generateBtn.addEventListener("click", async () => {
       if (!petImage.src) {
-        alert("Upload a pet photo first");
+        alert("Upload a pet photo first 🐶");
         return;
       }
 
@@ -136,14 +153,22 @@
       card.style.display = "block";
       downloadBtn.style.display = "block";
 
-      roastText.textContent = await getRoast();
+      const roast = await getRoast();
+      roastText.textContent = roast;
     });
 
-    downloadBtn.addEventListener("click", () => {
-      html2canvas(card).then(canvas => {
+    downloadBtn.addEventListener("click", async () => {
+      // Ensure text + image are fully rendered
+      await new Promise(resolve => setTimeout(resolve, 400));
+
+      html2canvas(card, {
+        backgroundColor: "#0b0b0f",
+        scale: 2,
+        useCORS: true
+      }).then(canvas => {
         const link = document.createElement("a");
-        link.download = "pawspace-roast.png";
-        link.href = canvas.toDataURL();
+        link.download = "pawspace-pet-roast.png";
+        link.href = canvas.toDataURL("image/png");
         link.click();
       });
     });
