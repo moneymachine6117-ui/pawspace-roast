@@ -22,6 +22,10 @@
       text-align: center;
     }
 
+    h2 {
+      margin-bottom: 12px;
+    }
+
     input[type="file"] {
       margin-bottom: 16px;
       color: white;
@@ -62,15 +66,17 @@
       font-size: 12px;
       opacity: 0.7;
       margin-top: 10px;
+      letter-spacing: 1px;
     }
 
     button {
-      margin-top: 16px;
+      margin-top: 14px;
       padding: 12px 18px;
       border-radius: 14px;
       border: none;
       font-weight: 700;
       cursor: pointer;
+      width: 100%;
     }
 
     .primary {
@@ -97,15 +103,26 @@
     </div>
 
     <button class="primary" id="generateBtn">Generate Roast</button>
+    <button class="primary" id="downloadBtn" style="display:none;">
+      Download Card
+    </button>
   </div>
+
+  <!-- html2canvas -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
     const roasts = [
       "This pet has main character energy and zero remorse.",
-      "Looks innocent. Causes chaos.",
+      "Looks innocent. Causes absolute chaos.",
       "CEO energy. No qualifications.",
       "Acts like it owns the place. It does.",
-      "Judges you silently. Always."
+      "Judges you silently. Always.",
+      "Professional napper. Amateur menace.",
+      "Cute face. Criminal intentions.",
+      "Runs the house like a tiny dictator.",
+      "Pure chaos wrapped in fur.",
+      "Thinks rules are suggestions."
     ];
 
     const upload = document.getElementById("upload");
@@ -113,6 +130,7 @@
     const card = document.getElementById("card");
     const roastText = document.getElementById("roastText");
     const generateBtn = document.getElementById("generateBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
 
     upload.addEventListener("change", () => {
       const file = upload.files[0];
@@ -121,9 +139,24 @@
     });
 
     generateBtn.addEventListener("click", () => {
-      const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
+      if (!petImage.src) {
+        alert("Upload a pet photo first 🐶");
+        return;
+      }
+      const randomRoast =
+        roasts[Math.floor(Math.random() * roasts.length)];
       roastText.textContent = randomRoast;
       card.style.display = "block";
+      downloadBtn.style.display = "block";
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      html2canvas(card).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "pawspace-pet-roast.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
     });
   </script>
 </body>
