@@ -15,15 +15,39 @@ export default async function handler(req, res) {
         messages: [
           {
             role: "system",
-            content:
-              "You write short, funny, light-hearted pet roasts. Never offensive. Max 15 words."
+            content: `
+You are a viral comedy writer for a pet app.
+
+Rules:
+- Roast the pet’s personality, not appearance.
+- Never insult the owner, humans, or protected groups.
+- No profanity, slurs, or sexual content.
+- Tone: playful, sarcastic, internet-humor.
+- Think “meme caption” energy.
+
+Style:
+- 8–14 words maximum.
+- One punchline.
+- Confident, funny, and slightly unhinged.
+- Avoid generic compliments.
+
+Examples:
+- "Looks calm. Definitely commits crimes when no one’s watching."
+- "Has one brain cell and it’s on airplane mode."
+- "Emotionally unavailable but demands cuddles."
+- "Acts innocent. Knows exactly what it’s doing."
+
+Now generate ONE roast for this pet.
+            `
           },
           {
             role: "user",
             content: "Roast this pet"
           }
         ],
-        temperature: 0.9
+        temperature: 0.95,
+        presence_penalty: 0.6,
+        frequency_penalty: 0.5
       })
     });
 
@@ -31,9 +55,9 @@ export default async function handler(req, res) {
     const roast = data?.choices?.[0]?.message?.content;
 
     res.status(200).json({
-      roast: roast || "This pet woke up and chose chaos."
+      roast: roast || "Looks innocent. Definitely plotting something."
     });
-  } catch {
+  } catch (error) {
     res.status(500).json({
       roast: "This pet is too powerful to roast."
     });

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PawSpace – Pet Roast</title>
+  <title>PawSpace – Roast Your Pet</title>
 
   <style>
     body {
@@ -66,13 +66,17 @@
       font-size: 22px;
       font-weight: 800;
       line-height: 1.25;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .footer {
-      font-size: 12px;
-      opacity: 0.7;
-      letter-spacing: 1px;
+      font-size: 11px;
+      opacity: 0.75;
+      letter-spacing: 0.4px;
+    }
+
+    .footer .cta {
+      font-weight: 700;
     }
 
     button {
@@ -113,7 +117,10 @@
       </div>
       <div class="content">
         <div class="roast" id="roastText"></div>
-        <div class="footer">PAWSPACE</div>
+        <div class="footer">
+          PAWSPACE · Roast your pet →
+          <span class="cta">pawspace.vercel.app</span>
+        </div>
       </div>
     </div>
 
@@ -131,16 +138,16 @@
 
   <!-- APP SCRIPT -->
   <script>
-    /* ------------------ DATA ------------------ */
+    /* ---------- DATA ---------- */
     const fallbackRoasts = [
-      "Main character energy. Zero apologies.",
-      "Cute face. Criminal intentions.",
-      "Runs the house like a tiny dictator.",
-      "Professional napper. Amateur menace.",
-      "Looks innocent. Causes chaos."
+      "Looks calm. Definitely commits crimes when no one’s watching.",
+      "Runs on vibes and bad decisions.",
+      "Emotionally unavailable but demands attention.",
+      "Acts innocent. Knows exactly what it’s doing.",
+      "One brain cell. Still in charge."
     ];
 
-    /* ------------------ ELEMENTS ------------------ */
+    /* ---------- ELEMENTS ---------- */
     const upload = document.getElementById("upload");
     const petImage = document.getElementById("petImage");
     const card = document.getElementById("card");
@@ -149,14 +156,14 @@
     const downloadBtn = document.getElementById("downloadBtn");
     const reportBtn = document.getElementById("reportBtn");
 
-    /* ------------------ IMAGE PREVIEW ------------------ */
+    /* ---------- IMAGE PREVIEW ---------- */
     upload.addEventListener("change", () => {
       const file = upload.files[0];
       if (!file) return;
       petImage.src = URL.createObjectURL(file);
     });
 
-    /* ------------------ FETCH ROAST ------------------ */
+    /* ---------- FETCH ROAST ---------- */
     async function getRoast() {
       try {
         const res = await fetch("/api/roast", { method: "POST" });
@@ -167,7 +174,7 @@
       }
     }
 
-    /* ------------------ GENERATE ROAST ------------------ */
+    /* ---------- GENERATE ROAST ---------- */
     generateBtn.addEventListener("click", async () => {
       if (!petImage.src) {
         alert("Upload a pet photo first 🐶");
@@ -183,7 +190,7 @@
       roastText.textContent = roast;
     });
 
-    /* ------------------ DOWNLOAD CARD ------------------ */
+    /* ---------- DOWNLOAD CARD ---------- */
     downloadBtn.addEventListener("click", async () => {
       await new Promise(resolve => setTimeout(resolve, 400));
 
@@ -196,10 +203,14 @@
         link.download = "pawspace-pet-roast.png";
         link.href = canvas.toDataURL("image/png");
         link.click();
+
+        setTimeout(() => {
+          alert("Share it on Instagram or X 😈");
+        }, 300);
       });
     });
 
-    /* ------------------ REPORT ------------------ */
+    /* ---------- REPORT ---------- */
     reportBtn.addEventListener("click", () => {
       alert("Thanks for reporting. This image will be reviewed.");
     });
