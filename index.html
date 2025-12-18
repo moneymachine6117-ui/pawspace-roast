@@ -22,30 +22,26 @@
       text-align: center;
     }
 
-    h2 {
-      margin-bottom: 12px;
-    }
-
     input[type="file"] {
       margin-bottom: 16px;
       color: white;
     }
 
     .card {
+      display: none;
       background: linear-gradient(180deg, #12121a, #0b0b0f);
       border-radius: 28px;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
       overflow: hidden;
-      display: none;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
     }
 
     .image-wrap {
       width: 100%;
-      aspect-ratio: 1 / 1;
+      aspect-ratio: 1/1;
       background: #1a1a24;
     }
 
-    .image-wrap img {
+    img {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -59,29 +55,22 @@
       font-size: 22px;
       font-weight: 800;
       line-height: 1.25;
-      margin-bottom: 10px;
     }
 
     .footer {
       font-size: 12px;
-      opacity: 0.7;
-      margin-top: 10px;
-      letter-spacing: 1px;
+      opacity: 0.6;
+      margin-top: 12px;
     }
 
     button {
+      width: 100%;
       margin-top: 14px;
-      padding: 12px 18px;
+      padding: 12px;
       border-radius: 14px;
       border: none;
       font-weight: 700;
       cursor: pointer;
-      width: 100%;
-    }
-
-    .primary {
-      background: white;
-      color: black;
     }
   </style>
 </head>
@@ -89,8 +78,7 @@
 <body>
   <div class="container">
     <h2>Upload your pet 🐾</h2>
-
-    <input type="file" accept="image/*" id="upload" />
+    <input type="file" id="upload" accept="image/*" />
 
     <div class="card" id="card">
       <div class="image-wrap">
@@ -102,27 +90,19 @@
       </div>
     </div>
 
-    <button class="primary" id="generateBtn">Generate Roast</button>
-    <button class="primary" id="downloadBtn" style="display:none;">
-      Download Card
-    </button>
+    <button id="generateBtn">Generate Roast</button>
+    <button id="downloadBtn" style="display:none;">Download Card</button>
   </div>
 
-  <!-- html2canvas -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
-    const roasts = [
-      "This pet has main character energy and zero remorse.",
-      "Looks innocent. Causes absolute chaos.",
-      "CEO energy. No qualifications.",
-      "Acts like it owns the place. It does.",
-      "Judges you silently. Always.",
-      "Professional napper. Amateur menace.",
+    const fallbackRoasts = [
+      "Main character energy. Zero apologies.",
       "Cute face. Criminal intentions.",
       "Runs the house like a tiny dictator.",
-      "Pure chaos wrapped in fur.",
-      "Thinks rules are suggestions."
+      "Professional napper. Amateur menace.",
+      "Looks innocent. Causes chaos."
     ];
 
     const upload = document.getElementById("upload");
@@ -133,28 +113,37 @@
     const downloadBtn = document.getElementById("downloadBtn");
 
     upload.addEventListener("change", () => {
-      const file = upload.files[0];
-      if (!file) return;
-      petImage.src = URL.createObjectURL(file);
+      petImage.src = URL.createObjectURL(upload.files[0]);
     });
 
-    generateBtn.addEventListener("click", () => {
+    async function getRoast() {
+      try {
+        const res = await fetch("/api/roast", { method: "POST" });
+        const data = await res.json();
+        return data.roast;
+      } catch {
+        return fallbackRoasts[Math.floor(Math.random() * fallbackRoasts.length)];
+      }
+    }
+
+    generateBtn.addEventListener("click", async () => {
       if (!petImage.src) {
-        alert("Upload a pet photo first 🐶");
+        alert("Upload a pet photo first");
         return;
       }
-      const randomRoast =
-        roasts[Math.floor(Math.random() * roasts.length)];
-      roastText.textContent = randomRoast;
+
+      roastText.textContent = "Roasting...";
       card.style.display = "block";
       downloadBtn.style.display = "block";
+
+      roastText.textContent = await getRoast();
     });
 
     downloadBtn.addEventListener("click", () => {
       html2canvas(card).then(canvas => {
         const link = document.createElement("a");
-        link.download = "pawspace-pet-roast.png";
-        link.href = canvas.toDataURL("image/png");
+        link.download = "pawspace-roast.png";
+        link.href = canvas.toDataURL();
         link.click();
       });
     });
