@@ -21,12 +21,12 @@ const ROASTS = [
 ];
 
 // Fake counter
-let roastCount = parseInt(localStorage.getItem("pawCount") || "27");
+let roastCount = parseInt(localStorage.getItem("pawCount") || "27", 10);
 counterEl.textContent = `🔥 ${roastCount} pets roasted`;
 
 let roastUsed = false;
 
-/* 🔁 RESET (CRITICAL) */
+/* 🔁 RESET UI (CRITICAL) */
 function resetUI() {
   roastUsed = false;
 
@@ -42,7 +42,7 @@ function resetUI() {
   roastText.textContent = "";
 }
 
-/* UPLOAD */
+/* UPLOAD PHOTO */
 uploadBtn.onclick = () => fileInput.click();
 
 fileInput.onchange = () => {
@@ -61,7 +61,7 @@ fileInput.onchange = () => {
   };
 };
 
-/* ROAST */
+/* ROAST PET */
 roastBtn.onclick = () => {
   if (roastUsed) return;
   roastUsed = true;
@@ -72,7 +72,7 @@ roastBtn.onclick = () => {
     ROASTS[Math.floor(Math.random() * ROASTS.length)];
 
   roastCount++;
-  localStorage.setItem("pawCount", roastCount);
+  localStorage.setItem("pawCount", roastCount.toString());
   counterEl.textContent = `🔥 ${roastCount} pets roasted`;
 
   gifBtn.disabled = false;
@@ -90,24 +90,32 @@ downloadBtn.onclick = async () => {
   a.click();
 };
 
-/* SHARE */
+/* SHARE IMAGE */
 shareBtn.onclick = async () => {
   const canvas = await html2canvas(card, { scale: 3 });
 
-  canvas.toBlob(async blob => {
-    const file = new File([blob], "pawspace-roast.png", { type: "image/png" });
+  canvas.toBlob(async (blob) => {
+    if (!blob) return;
 
+    const file = new File([blob], "pawspace-roast.png", {
+      type: "image/png"
+    });
+
+    // Native share (mobile browsers)
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({
           files: [file],
           title: "Roast My Pet 😂",
-          text: "I roasted my pet on PawSpace 🐾🔥"
+          text: "Check out my pet roast — try it yourself 👉 pawspace-roast.vercel.app"
         });
         return;
-      } catch {}
+      } catch (err) {
+        console.log("Share cancelled", err);
+      }
     }
 
+    // Fallback: download
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "pawspace-roast.png";
@@ -115,7 +123,7 @@ shareBtn.onclick = async () => {
   });
 };
 
-/* GIF MEME */
+/* GENERATE GIF MEME */
 gifBtn.onclick = async () => {
   gifBtn.disabled = true;
   gifBtn.textContent = "Generating…";
@@ -153,7 +161,7 @@ gifBtn.onclick = async () => {
   );
 };
 
-/* ROAST ANOTHER */
+/* ROAST ANOTHER PET */
 againBtn.onclick = () => {
   fileInput.value = "";
   petImage.style.display = "none";
