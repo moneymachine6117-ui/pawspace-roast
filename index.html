@@ -5,15 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PawSpace</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
 <style>
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
-  font-family: Inter, sans-serif;
   background: #0b0b0f;
   color: white;
+  font-family: system-ui, -apple-system, Arial, sans-serif;
   display: flex;
   justify-content: center;
   min-height: 100vh;
@@ -38,16 +37,19 @@ body {
   overflow: hidden;
 }
 
-.image {
+.image-box {
+  width: 100%;
   aspect-ratio: 1 / 1;
   background: #222;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #777;
+  font-size: 14px;
+  position: relative;
 }
 
-.image img {
+.image-box img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -58,6 +60,7 @@ body {
   padding: 16px;
   font-size: 20px;
   font-weight: 700;
+  min-height: 48px;
 }
 
 button {
@@ -76,9 +79,10 @@ button {
   color: black;
 }
 
-.secondary {
-  background: #222;
-  color: white;
+.footer {
+  margin-top: 20px;
+  font-size: 12px;
+  opacity: 0.6;
 }
 
 input[type=file] {
@@ -88,23 +92,66 @@ input[type=file] {
 </head>
 
 <body>
+
 <div class="app">
   <div class="logo">🐾 PawSpace</div>
 
-  <input type="file" id="upload" accept="image/*">
-
-  <div class="card" id="card">
-    <div class="image" id="imageBox">
-      Upload a pet photo
+  <div class="card">
+    <div class="image-box" id="imageBox">
+      <span id="placeholder">Upload a pet photo</span>
       <img id="petImage">
     </div>
     <div class="roast" id="roastText">Waiting for photo…</div>
   </div>
 
+  <input type="file" id="fileInput" accept="image/*">
   <button class="primary" id="uploadBtn">Upload Photo</button>
-  <button class="secondary" id="downloadBtn">Download Image</button>
+
+  <div class="footer">
+    Powered by PawSpace<br>
+    For entertainment only
+  </div>
 </div>
 
-<script src="script.js" defer></script>
+<script>
+console.log("✅ SCRIPT LOADED");
+
+const uploadBtn = document.getElementById("uploadBtn");
+const fileInput = document.getElementById("fileInput");
+const petImage = document.getElementById("petImage");
+const placeholder = document.getElementById("placeholder");
+const roastText = document.getElementById("roastText");
+
+const roasts = [
+  "No thoughts. Just audacity.",
+  "Runs entirely on vibes.",
+  "A menace wrapped in fur.",
+  "Confidence greater than intelligence.",
+  "Main character energy. Zero awareness."
+];
+
+uploadBtn.onclick = () => {
+  console.log("Upload button clicked");
+  fileInput.click();
+};
+
+fileInput.onchange = () => {
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  console.log("File selected:", file.name);
+
+  petImage.onload = () => {
+    petImage.style.display = "block";
+    placeholder.style.display = "none";
+    roastText.textContent =
+      roasts[Math.floor(Math.random() * roasts.length)];
+    console.log("Image loaded successfully");
+  };
+
+  petImage.src = URL.createObjectURL(file);
+};
+</script>
+
 </body>
 </html>
