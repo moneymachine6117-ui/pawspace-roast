@@ -64,6 +64,8 @@
     font-weight: 800;
     line-height: 1.25;
     margin-bottom: 12px;
+    opacity: 1;
+    transition: opacity 0.6s ease;
   }
 
   .footer {
@@ -121,12 +123,12 @@
   </div>
 
   <button class="primary" id="generateBtn">Generate Roast</button>
-  <button class="primary" id="shareBtn" style="display:none;">Share to Instagram</button>
-  <button class="secondary" id="downloadBtn" style="display:none;">Download Card</button>
+  <button class="primary" id="shareBtn" style="display:none;">Share Image</button>
+  <button class="primary" id="videoBtn" style="display:none;">Create Share Video</button>
+  <button class="secondary" id="downloadBtn" style="display:none;">Download Image</button>
 
 </div>
 
-<!-- html2canvas -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
@@ -137,15 +139,16 @@
   const generateBtn = document.getElementById("generateBtn");
   const downloadBtn = document.getElementById("downloadBtn");
   const shareBtn = document.getElementById("shareBtn");
+  const videoBtn = document.getElementById("videoBtn");
 
   let imageLoaded = false;
 
   const fallbackRoasts = [
-    "Looks calm. Definitely commits crimes.",
-    "Runs on vibes and bad decisions.",
-    "Acts innocent. Knows exactly what it’s doing.",
-    "Emotionally unavailable but demanding.",
-    "One brain cell. Still dangerous."
+    "Zero thoughts. Unlimited confidence.",
+    "Acts surprised by consequences it caused.",
+    "Main character energy. Side character intelligence.",
+    "Runs entirely on delusion.",
+    "A menace with no strategy."
   ];
 
   upload.addEventListener("change", () => {
@@ -182,12 +185,12 @@
 
     shareBtn.style.display = "block";
     downloadBtn.style.display = "block";
+    videoBtn.style.display = "block";
   });
 
   async function generateCanvas() {
     await new Promise(r => setTimeout(r, 400));
     const rect = card.getBoundingClientRect();
-
     return html2canvas(card, {
       backgroundColor: "#0b0b0f",
       scale: 4,
@@ -197,9 +200,15 @@
     });
   }
 
+  function downloadImage(src) {
+    const link = document.createElement("a");
+    link.href = src;
+    link.download = "pawspace-roast.png";
+    link.click();
+  }
+
   shareBtn.addEventListener("click", async () => {
     const canvas = await generateCanvas();
-
     canvas.toBlob(async blob => {
       const file = new File([blob], "pawspace-roast.png", { type: "image/png" });
 
@@ -210,8 +219,7 @@
           text: "Roast your pet → pawspace.vercel.app"
         });
       } else {
-        downloadImage(blob);
-        alert("Downloaded — share it on Instagram 📸");
+        downloadImage(canvas.toDataURL("image/png", 1.0));
       }
     });
   });
@@ -221,12 +229,40 @@
     downloadImage(canvas.toDataURL("image/png", 1.0));
   });
 
-  function downloadImage(src) {
-    const link = document.createElement("a");
-    link.href = src;
-    link.download = "pawspace-roast-UHD.png";
-    link.click();
-  }
+  /* ---------- VIDEO CREATION ---------- */
+  videoBtn.addEventListener("click", async () => {
+    alert("Creating video… please wait ⏳");
+
+    roastText.style.opacity = 0;
+
+    const stream = card.captureStream(30);
+    const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+    const chunks = [];
+
+    recorder.ondataavailable = e => chunks.push(e.data);
+    recorder.start();
+
+    setTimeout(() => roastText.style.opacity = 1, 1500);
+    setTimeout(() => recorder.stop(), 7000);
+
+    recorder.onstop = async () => {
+      const blob = new Blob(chunks, { type: "video/webm" });
+      const file = new File([blob], "pawspace-roast-video.webm", { type: "video/webm" });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "Roast my pet 😈",
+          text: "Roast your pet → pawspace.vercel.app"
+        });
+      } else {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "pawspace-roast-video.webm";
+        link.click();
+      }
+    };
+  });
 </script>
 </body>
 </html>

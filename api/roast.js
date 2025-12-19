@@ -1,54 +1,59 @@
 <script>
-  const shareBtn = document.getElementById("shareBtn");
+  const videoBtn = document.getElementById("videoBtn");
 
-  /* ---------- SHOW SHARE BUTTON AFTER ROAST ---------- */
+  // Show video button after roast
   generateBtn.addEventListener("click", () => {
     setTimeout(() => {
-      shareBtn.style.display = "block";
-    }, 800);
+      videoBtn.style.display = "block";
+    }, 1000);
   });
 
-  /* ---------- SHARE TO INSTAGRAM (MOBILE) ---------- */
-  shareBtn.addEventListener("click", async () => {
-    await new Promise(resolve => setTimeout(resolve, 400));
+  videoBtn.addEventListener("click", async () => {
+    alert("Creating video… please wait ⏳");
 
-    const rect = card.getBoundingClientRect();
-
-    const canvas = await html2canvas(card, {
-      backgroundColor: "#0b0b0f",
-      scale: 4,
-      width: rect.width,
-      height: rect.height,
-      useCORS: true
+    const stream = card.captureStream(30); // 30 FPS
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType: "video/webm"
     });
 
-    canvas.toBlob(async blob => {
-      const file = new File(
-        [blob],
-        "pawspace-roast.png",
-        { type: "image/png" }
-      );
+    const chunks = [];
+    mediaRecorder.ondataavailable = e => chunks.push(e.data);
 
-      // ✅ Mobile native share (Instagram appears here)
+    mediaRecorder.start();
+
+    // Animation timing
+    roastText.style.opacity = 0;
+
+    setTimeout(() => {
+      roastText.style.opacity = 1;
+    }, 1500);
+
+    // Stop after 7 seconds
+    setTimeout(() => {
+      mediaRecorder.stop();
+    }, 7000);
+
+    mediaRecorder.onstop = async () => {
+      const blob = new Blob(chunks, { type: "video/webm" });
+      const file = new File([blob], "pawspace-roast-video.webm", {
+        type: "video/webm"
+      });
+
+      // Mobile share
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: "Roast my pet 😈",
-            text: "Roast your pet → pawspace.vercel.app"
-          });
-        } catch (err) {
-          console.log("Share cancelled");
-        }
+        await navigator.share({
+          files: [file],
+          title: "Roast my pet 😈",
+          text: "Roast your pet → pawspace.vercel.app"
+        });
       } else {
-        // ❌ Fallback: download
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = "pawspace-roast.png";
+        link.download = "pawspace-roast-video.webm";
         link.click();
 
-        alert("Image downloaded — share it on Instagram 📸");
+        alert("Video downloaded — upload to TikTok or Instagram 🎥");
       }
-    });
+    };
   });
 </script>
