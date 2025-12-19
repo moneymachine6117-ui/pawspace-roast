@@ -3,69 +3,70 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>PawSpace — Roast Your Pet</title>
+<title>PawSpace AI Roast</title>
 
-<!-- META -->
 <meta name="description" content="Upload your pet. Get a ruthless AI roast. Share instantly." />
 <meta name="theme-color" content="#0b0b0f">
 
-<!-- FONT -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
-<!-- HTML2CANVAS -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
-/* ================= BASE ================= */
+/* ========== BASE ========== */
 * { box-sizing: border-box; }
 body {
   margin: 0;
   font-family: Inter, system-ui, sans-serif;
-  background: radial-gradient(1200px at top, #12121a, #050508);
+  background: radial-gradient(900px at top, #14141c, #050507);
   color: #fff;
-  min-height: 100vh;
   display: flex;
   justify-content: center;
+  min-height: 100vh;
 }
 
 .app {
   width: 100%;
   max-width: 420px;
-  padding: 20px;
+  padding: 18px 16px 28px;
 }
 
-/* ================= LOGO ================= */
-.logo {
-  text-align: center;
+/* ========== HEADER ========== */
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 18px;
+  opacity: .95;
+}
+
+.header .paw {
+  font-size: 20px;
+}
+
+.header .title {
   font-weight: 800;
-  font-size: 28px;
-  letter-spacing: -0.5px;
-  margin: 20px 0 30px;
-  animation: float 4s ease-in-out infinite;
+  letter-spacing: -0.4px;
 }
 
-.logo span {
-  opacity: 0.6;
+.header .sub {
+  opacity: .5;
   font-weight: 600;
+  margin-left: 4px;
 }
 
-@keyframes float {
-  0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-/* ================= CARD ================= */
+/* ========== CARD ========== */
 .card {
   display: none;
-  background: linear-gradient(180deg, #151520, #0b0b0f);
-  border-radius: 28px;
+  background: linear-gradient(180deg, #181822, #0b0b0f);
+  border-radius: 26px;
   overflow: hidden;
-  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+  box-shadow: 0 40px 80px rgba(0,0,0,.7);
 }
 
 .image {
   aspect-ratio: 1/1;
-  background: #1b1b28;
+  background: #1a1a25;
 }
 
 .image img {
@@ -75,7 +76,7 @@ body {
 }
 
 .content {
-  padding: 22px;
+  padding: 20px;
 }
 
 .roast {
@@ -87,53 +88,68 @@ body {
 }
 
 .watermark {
-  font-size: 11px;
-  opacity: 0.6;
   margin-top: 12px;
+  font-size: 11px;
+  opacity: .6;
 }
 
-/* ================= ACTIONS ================= */
+/* ========== PRIMARY CTA ========== */
+.primary-cta {
+  margin-top: 18px;
+}
+
+.primary-cta button {
+  width: 100%;
+  padding: 16px;
+  border-radius: 18px;
+  border: none;
+  background: #ffffff;
+  color: #000;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* ========== SECONDARY ACTIONS ========== */
 .actions {
   display: none;
-  margin-top: 16px;
+  margin-top: 14px;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 10px;
 }
 
-button {
-  border-radius: 14px;
-  border: 1px solid #2a2a38;
-  background: #151520;
-  color: white;
-  font-size: 16px;
+.actions button {
   padding: 12px 0;
+  border-radius: 14px;
+  background: #151520;
+  border: 1px solid #2a2a38;
+  color: #fff;
+  font-size: 16px;
   cursor: pointer;
 }
 
-button.primary {
-  background: white;
-  color: black;
+.actions button.primary {
+  background: #fff;
+  color: #000;
   font-weight: 700;
 }
 
-button:disabled {
+.actions button:disabled {
   opacity: .4;
   cursor: not-allowed;
 }
 
-/* ================= FOOTER ================= */
+/* ========== FOOTER ========== */
 .footer {
+  margin-top: 26px;
   text-align: center;
-  margin: 30px 10px 10px;
   font-size: 12px;
-  opacity: 0.6;
-  line-height: 1.4;
+  opacity: .55;
+  line-height: 1.5;
 }
 
-.footer strong { opacity: .9; }
-
-/* ================= UPLOAD ================= */
+/* ========== HIDDEN ========== */
 input[type=file] { display: none; }
 </style>
 </head>
@@ -141,8 +157,12 @@ input[type=file] { display: none; }
 <body>
 <div class="app">
 
-  <!-- LOGO -->
-  <div class="logo">🐾 PawSpace <span>AI Roast</span></div>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="paw">🐾</div>
+    <div class="title">PawSpace</div>
+    <div class="sub">AI Roast</div>
+  </div>
 
   <!-- UPLOAD -->
   <input type="file" id="upload" accept="image/*" />
@@ -154,14 +174,18 @@ input[type=file] { display: none; }
     </div>
     <div class="content">
       <div class="roast" id="roastText"></div>
-      <div class="watermark">Roast your pet → pawspace.app</div>
+      <div class="watermark">pawspace.app · Roast your pet</div>
     </div>
   </div>
 
-  <!-- ACTION BAR -->
+  <!-- PRIMARY CTA -->
+  <div class="primary-cta">
+    <button id="uploadBtn">Upload Pet Photo</button>
+  </div>
+
+  <!-- SECONDARY ACTIONS -->
   <div class="actions" id="actions">
-    <button id="addImage">➕🖼</button>
-    <button id="addVideo">➕🎥</button>
+    <button id="addVideo">🎥</button>
     <button id="share" class="primary">🔗</button>
     <button id="downloadImage">⬇🖼</button>
     <button id="downloadVideo">⬇🎥</button>
@@ -169,23 +193,22 @@ input[type=file] { display: none; }
 
   <!-- FOOTER -->
   <div class="footer">
-    Powered by <strong>PawSpace AI</strong><br>
-    For entertainment only · No animals were harmed · Content moderated
+    Powered by PawSpace AI<br>
+    For entertainment only · Content moderated
   </div>
 
 </div>
 
-<!-- ================= SCRIPT ================= -->
 <script>
 const $ = id => document.getElementById(id);
 
 const upload = $("upload");
+const uploadBtn = $("uploadBtn");
 const petImage = $("petImage");
 const card = $("card");
 const roastText = $("roastText");
 const actions = $("actions");
 
-const btnAddImage = $("addImage");
 const btnAddVideo = $("addVideo");
 const btnShare = $("share");
 const btnDownloadImage = $("downloadImage");
@@ -199,14 +222,14 @@ const state = {
 };
 
 const fallbackRoasts = [
-  "This creature runs on confidence, not intelligence.",
-  "A menace to society with zero remorse.",
   "No thoughts. Just audacity.",
-  "Survives purely on vibes.",
-  "An icon. A disaster. A legend."
+  "Runs entirely on vibes.",
+  "A menace wrapped in fur.",
+  "Confidence greater than intelligence.",
+  "Main character. Zero awareness."
 ];
 
-btnAddImage.onclick = () => upload.click();
+uploadBtn.onclick = () => upload.click();
 
 upload.onchange = () => {
   const file = upload.files[0];
@@ -269,7 +292,7 @@ btnDownloadImage.onclick = async () => {
 
 btnDownloadVideo.onclick = () => {
   if (!state.videoBlob) return;
-  download(state.videoBlob, "pawspace-roast-video.webm");
+  download(state.videoBlob, "pawspace-video.webm");
 };
 
 btnShare.onclick = async () => {
@@ -280,7 +303,7 @@ btnShare.onclick = async () => {
     await navigator.share({
       files: [file],
       title: "Roast my pet 😈",
-      text: "Roast your pet → pawspace.app"
+      text: "pawspace.app"
     });
   } else {
     download(blob, "pawspace-share");
@@ -323,6 +346,5 @@ function download(blob, name) {
   a.click();
 }
 </script>
-
 </body>
 </html>
