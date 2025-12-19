@@ -9,7 +9,7 @@ const roastText = document.getElementById("roastText");
 const card = document.getElementById("card");
 
 let imageReady = false;
-let roastedAlready = false;
+let roastLocked = false; // 🔒 HARD LOCK
 
 const FALLBACK_ROASTS = [
   "No thoughts. Just audacity.",
@@ -19,6 +19,7 @@ const FALLBACK_ROASTS = [
   "Zero remorse. Pure chaos."
 ];
 
+/* UPLOAD */
 uploadBtn.onclick = () => fileInput.click();
 
 fileInput.onchange = () => {
@@ -28,33 +29,38 @@ fileInput.onchange = () => {
   petImage.onload = () => {
     petImage.style.display = "block";
     placeholder.style.display = "none";
+
     roastText.textContent = "Ready to roast 🔥";
-    roastBtn.disabled = false;
-    downloadBtn.disabled = true;
 
     imageReady = true;
-    roastedAlready = false; // 🔁 reset per upload
+    roastLocked = false; // 🔁 reset ONLY on new upload
+
+    roastBtn.disabled = false;
+    roastBtn.textContent = "🔥 Generate AI Roast";
+    downloadBtn.disabled = true;
   };
 
   petImage.src = URL.createObjectURL(file);
 };
 
+/* ROAST — ONE TIME ONLY */
 roastBtn.onclick = async () => {
-  if (!imageReady || roastedAlready) return;
+  if (!imageReady || roastLocked) return;
 
-  roastedAlready = true;
-  roastBtn.textContent = "Roast Generated ✓";
+  // 🔒 LOCK IMMEDIATELY (NO ASYNC GAP)
+  roastLocked = true;
   roastBtn.disabled = true;
+  roastBtn.textContent = "Roast Generated ✓";
   roastText.textContent = "Roasting with AI… 😈";
 
   try {
     const res = await fetch("/api/roast", { method: "POST" });
     const data = await res.json();
 
-    if (data.roast) {
+    if (data && data.roast) {
       roastText.textContent = data.roast;
     } else {
-      throw new Error("No roast");
+      throw new Error("Invalid AI response");
     }
   } catch (err) {
     roastText.textContent =
