@@ -1,219 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PawSpace – Roast Your Pet</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PawSpace – Roast Your Pet</title>
 
-  <style>
-    body {
-      margin: 0;
-      background: #0b0b0f;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
+<style>
+  body {
+    margin: 0;
+    background: #0b0b0f;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
 
-    .container {
-      width: 360px;
-      text-align: center;
-    }
+  .container {
+    width: 360px;
+    text-align: center;
+  }
 
-    h2 {
-      margin-bottom: 12px;
-    }
+  h2 { margin-bottom: 12px; }
 
-    input[type="file"] {
-      margin-bottom: 6px;
-      color: white;
-    }
+  input[type="file"] {
+    color: white;
+    margin-bottom: 6px;
+  }
 
-    .disclaimer {
-      font-size: 12px;
-      opacity: 0.6;
-      margin-bottom: 16px;
-    }
+  .disclaimer {
+    font-size: 12px;
+    opacity: 0.6;
+    margin-bottom: 14px;
+  }
 
-    .card {
-      display: none;
-      background: linear-gradient(180deg, #12121a, #0b0b0f);
-      border-radius: 28px;
-      overflow: hidden;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
-    }
+  .card {
+    display: none;
+    background: linear-gradient(180deg, #12121a, #0b0b0f);
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+  }
 
-    .image-wrap {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background: #1a1a24;
-    }
+  .image-wrap {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #1a1a24;
+  }
 
-    .image-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+  .image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
-    .content {
-      padding: 20px;
-    }
+  .content {
+    padding: 20px;
+  }
 
-    .roast {
-      font-size: 22px;
-      font-weight: 800;
-      line-height: 1.25;
-      margin-bottom: 12px;
-    }
+  .roast {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 12px;
+  }
 
-    .footer {
-      font-size: 11px;
-      opacity: 0.75;
-      letter-spacing: 0.4px;
-    }
+  .footer {
+    font-size: 11px;
+    opacity: 0.75;
+    letter-spacing: 0.4px;
+  }
 
-    .footer .cta {
-      font-weight: 700;
-    }
+  .footer .cta { font-weight: 700; }
 
-    button {
-      margin-top: 14px;
-      padding: 12px;
-      border-radius: 14px;
-      border: none;
-      font-weight: 700;
-      cursor: pointer;
-      width: 100%;
-    }
+  button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    border-radius: 14px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+  }
 
-    .primary {
-      background: white;
-      color: black;
-    }
+  .primary {
+    background: white;
+    color: black;
+  }
 
-    .secondary {
-      background: transparent;
-      color: #aaa;
-      border: 1px solid #333;
-    }
-  </style>
+  .secondary {
+    background: transparent;
+    border: 1px solid #333;
+    color: #aaa;
+  }
+</style>
 </head>
 
 <body>
-  <div class="container">
-    <h2>Upload your pet 🐾</h2>
+<div class="container">
 
-    <input type="file" accept="image/*" id="upload" />
-    <div class="disclaimer">
-      Upload only pet images. Illegal or inappropriate content may be removed.
-    </div>
+  <h2>Upload your pet 🐾</h2>
 
-    <div class="card" id="card">
-      <div class="image-wrap">
-        <img id="petImage" crossorigin="anonymous" />
-      </div>
-      <div class="content">
-        <div class="roast" id="roastText"></div>
-        <div class="footer">
-          PAWSPACE · Roast your pet →
-          <span class="cta">pawspace.vercel.app</span>
-        </div>
-      </div>
-    </div>
-
-    <button class="primary" id="generateBtn">Generate Roast</button>
-    <button class="primary" id="downloadBtn" style="display:none;">
-      Download Card
-    </button>
-    <button class="secondary" id="reportBtn" style="display:none;">
-      Report Image
-    </button>
+  <input type="file" accept="image/*" id="upload" />
+  <div class="disclaimer">
+    Upload only pet images. Inappropriate content may be removed.
   </div>
 
-  <!-- html2canvas -->
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <div class="card" id="card">
+    <div class="image-wrap">
+      <img id="petImage" crossorigin="anonymous" />
+    </div>
+    <div class="content">
+      <div class="roast" id="roastText"></div>
+      <div class="footer">
+        PAWSPACE · Roast your pet →
+        <span class="cta">pawspace.vercel.app</span>
+      </div>
+    </div>
+  </div>
 
-  <!-- APP SCRIPT -->
-  <script>
-    /* ---------- DATA ---------- */
-    const fallbackRoasts = [
-      "Looks calm. Definitely commits crimes when no one’s watching.",
-      "Runs on vibes and bad decisions.",
-      "Emotionally unavailable but demands attention.",
-      "Acts innocent. Knows exactly what it’s doing.",
-      "One brain cell. Still in charge."
-    ];
+  <button class="primary" id="generateBtn">Generate Roast</button>
+  <button class="primary" id="shareBtn" style="display:none;">Share to Instagram</button>
+  <button class="secondary" id="downloadBtn" style="display:none;">Download Card</button>
 
-    /* ---------- ELEMENTS ---------- */
-    const upload = document.getElementById("upload");
-    const petImage = document.getElementById("petImage");
-    const card = document.getElementById("card");
-    const roastText = document.getElementById("roastText");
-    const generateBtn = document.getElementById("generateBtn");
-    const downloadBtn = document.getElementById("downloadBtn");
-    const reportBtn = document.getElementById("reportBtn");
+</div>
 
-    /* ---------- IMAGE PREVIEW ---------- */
-    upload.addEventListener("change", () => {
-      const file = upload.files[0];
-      if (!file) return;
-      petImage.src = URL.createObjectURL(file);
-    });
+<!-- html2canvas -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-    /* ---------- FETCH ROAST ---------- */
-    async function getRoast() {
-      try {
-        const res = await fetch("/api/roast", { method: "POST" });
-        const data = await res.json();
-        return data.roast;
-      } catch {
-        return fallbackRoasts[Math.floor(Math.random() * fallbackRoasts.length)];
-      }
+<script>
+  const upload = document.getElementById("upload");
+  const petImage = document.getElementById("petImage");
+  const card = document.getElementById("card");
+  const roastText = document.getElementById("roastText");
+  const generateBtn = document.getElementById("generateBtn");
+  const downloadBtn = document.getElementById("downloadBtn");
+  const shareBtn = document.getElementById("shareBtn");
+
+  let imageLoaded = false;
+
+  const fallbackRoasts = [
+    "Looks calm. Definitely commits crimes.",
+    "Runs on vibes and bad decisions.",
+    "Acts innocent. Knows exactly what it’s doing.",
+    "Emotionally unavailable but demanding.",
+    "One brain cell. Still dangerous."
+  ];
+
+  upload.addEventListener("change", () => {
+    const file = upload.files[0];
+    if (!file) return;
+    petImage.onload = () => imageLoaded = true;
+    petImage.src = URL.createObjectURL(file);
+  });
+
+  async function getRoast() {
+    try {
+      const res = await fetch("/api/roast", { method: "POST" });
+      const data = await res.json();
+      return data.roast;
+    } catch {
+      return fallbackRoasts[Math.floor(Math.random() * fallbackRoasts.length)];
+    }
+  }
+
+  generateBtn.addEventListener("click", async () => {
+    if (!imageLoaded) {
+      alert("Upload a pet image first 🐶");
+      return;
     }
 
-    /* ---------- GENERATE ROAST ---------- */
-    generateBtn.addEventListener("click", async () => {
-      if (!petImage.src) {
-        alert("Upload a pet photo first 🐶");
-        return;
+    upload.style.display = "none";
+    generateBtn.style.display = "none";
+
+    roastText.textContent = "Roasting...";
+    card.style.display = "block";
+
+    const roast = await getRoast();
+    roastText.textContent = roast;
+
+    shareBtn.style.display = "block";
+    downloadBtn.style.display = "block";
+  });
+
+  async function generateCanvas() {
+    await new Promise(r => setTimeout(r, 400));
+    const rect = card.getBoundingClientRect();
+
+    return html2canvas(card, {
+      backgroundColor: "#0b0b0f",
+      scale: 4,
+      width: rect.width,
+      height: rect.height,
+      useCORS: true
+    });
+  }
+
+  shareBtn.addEventListener("click", async () => {
+    const canvas = await generateCanvas();
+
+    canvas.toBlob(async blob => {
+      const file = new File([blob], "pawspace-roast.png", { type: "image/png" });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "Roast my pet 😈",
+          text: "Roast your pet → pawspace.vercel.app"
+        });
+      } else {
+        downloadImage(blob);
+        alert("Downloaded — share it on Instagram 📸");
       }
-
-      roastText.textContent = "Roasting...";
-      card.style.display = "block";
-      downloadBtn.style.display = "block";
-      reportBtn.style.display = "block";
-
-      const roast = await getRoast();
-      roastText.textContent = roast;
     });
+  });
 
-    /* ---------- DOWNLOAD CARD ---------- */
-    downloadBtn.addEventListener("click", async () => {
-      await new Promise(resolve => setTimeout(resolve, 400));
+  downloadBtn.addEventListener("click", async () => {
+    const canvas = await generateCanvas();
+    downloadImage(canvas.toDataURL("image/png", 1.0));
+  });
 
-      html2canvas(card, {
-        backgroundColor: "#0b0b0f",
-        scale: 2,
-        useCORS: true
-      }).then(canvas => {
-        const link = document.createElement("a");
-        link.download = "pawspace-pet-roast.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-
-        setTimeout(() => {
-          alert("Share it on Instagram or X 😈");
-        }, 300);
-      });
-    });
-
-    /* ---------- REPORT ---------- */
-    reportBtn.addEventListener("click", () => {
-      alert("Thanks for reporting. This image will be reviewed.");
-    });
-  </script>
+  function downloadImage(src) {
+    const link = document.createElement("a");
+    link.href = src;
+    link.download = "pawspace-roast-UHD.png";
+    link.click();
+  }
+</script>
 </body>
 </html>
