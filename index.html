@@ -22,19 +22,6 @@
     text-align: center;
   }
 
-  h2 { margin-bottom: 12px; }
-
-  input[type="file"] {
-    color: white;
-    margin-bottom: 6px;
-  }
-
-  .disclaimer {
-    font-size: 12px;
-    opacity: 0.6;
-    margin-bottom: 14px;
-  }
-
   .card {
     display: none;
     background: linear-gradient(180deg, #12121a, #0b0b0f);
@@ -44,8 +31,7 @@
   }
 
   .image-wrap {
-    width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 1/1;
     background: #1a1a24;
   }
 
@@ -63,38 +49,41 @@
     font-size: 22px;
     font-weight: 800;
     line-height: 1.25;
-    margin-bottom: 12px;
-    opacity: 1;
-    transition: opacity 0.6s ease;
   }
 
   .footer {
     font-size: 11px;
     opacity: 0.75;
-    letter-spacing: 0.4px;
+    margin-top: 10px;
   }
 
-  .footer .cta { font-weight: 700; }
+  /* ACTION BAR */
+  .actions {
+    display: none;
+    margin-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
 
-  button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 12px;
-    border-radius: 14px;
-    border: none;
-    font-weight: 700;
+  .action-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 12px;
+    background: #1a1a24;
+    border: 1px solid #333;
+    color: white;
+    font-size: 16px;
     cursor: pointer;
   }
 
-  .primary {
+  .action-btn.primary {
     background: white;
     color: black;
   }
 
-  .secondary {
-    background: transparent;
-    border: 1px solid #333;
-    color: #aaa;
+  input[type=file] {
+    display: none;
   }
 </style>
 </head>
@@ -102,30 +91,30 @@
 <body>
 <div class="container">
 
-  <h2>Upload your pet 🐾</h2>
+  <!-- Hidden upload -->
+  <input type="file" accept="image/*" id="upload">
 
-  <input type="file" accept="image/*" id="upload" />
-  <div class="disclaimer">
-    Upload only pet images. Inappropriate content may be removed.
-  </div>
-
+  <!-- CARD -->
   <div class="card" id="card">
     <div class="image-wrap">
-      <img id="petImage" crossorigin="anonymous" />
+      <img id="petImage">
     </div>
     <div class="content">
       <div class="roast" id="roastText"></div>
       <div class="footer">
-        PAWSPACE · Roast your pet →
-        <span class="cta">pawspace.vercel.app</span>
+        PAWSPACE · Roast your pet → pawspace.vercel.app
       </div>
     </div>
   </div>
 
-  <button class="primary" id="generateBtn">Generate Roast</button>
-  <button class="primary" id="shareBtn" style="display:none;">Share Image</button>
-  <button class="primary" id="videoBtn" style="display:none;">Create Share Video</button>
-  <button class="secondary" id="downloadBtn" style="display:none;">Download Image</button>
+  <!-- ACTION BAR -->
+  <div class="actions" id="actions">
+    <button class="action-btn" id="addImage">➕🖼</button>
+    <button class="action-btn" id="addVideo">➕🎥</button>
+    <button class="action-btn primary" id="share">🔗</button>
+    <button class="action-btn" id="downloadImage">⬇🖼</button>
+    <button class="action-btn" id="downloadVideo">⬇🎥</button>
+  </div>
 
 </div>
 
@@ -136,12 +125,17 @@
   const petImage = document.getElementById("petImage");
   const card = document.getElementById("card");
   const roastText = document.getElementById("roastText");
-  const generateBtn = document.getElementById("generateBtn");
-  const downloadBtn = document.getElementById("downloadBtn");
-  const shareBtn = document.getElementById("shareBtn");
-  const videoBtn = document.getElementById("videoBtn");
+  const actions = document.getElementById("actions");
+
+  const addImageBtn = document.getElementById("addImage");
+  const addVideoBtn = document.getElementById("addVideo");
+  const shareBtn = document.getElementById("share");
+  const downloadImageBtn = document.getElementById("downloadImage");
+  const downloadVideoBtn = document.getElementById("downloadVideo");
 
   let imageLoaded = false;
+  let lastImageBlob = null;
+  let lastVideoBlob = null;
 
   const fallbackRoasts = [
     "Zero thoughts. Unlimited confidence.",
@@ -151,118 +145,90 @@
     "A menace with no strategy."
   ];
 
-  upload.addEventListener("change", () => {
+  addImageBtn.onclick = () => upload.click();
+
+  upload.onchange = () => {
     const file = upload.files[0];
     if (!file) return;
-    petImage.onload = () => imageLoaded = true;
     petImage.src = URL.createObjectURL(file);
-  });
+    imageLoaded = true;
+    generateRoast();
+  };
 
-  async function getRoast() {
+  async function generateRoast() {
+    card.style.display = "block";
+    actions.style.display = "flex";
+    roastText.textContent = "Roasting...";
+
     try {
       const res = await fetch("/api/roast", { method: "POST" });
       const data = await res.json();
-      return data.roast;
+      roastText.textContent = data.roast;
     } catch {
-      return fallbackRoasts[Math.floor(Math.random() * fallbackRoasts.length)];
+      roastText.textContent =
+        fallbackRoasts[Math.floor(Math.random() * fallbackRoasts.length)];
     }
   }
 
-  generateBtn.addEventListener("click", async () => {
-    if (!imageLoaded) {
-      alert("Upload a pet image first 🐶");
-      return;
-    }
-
-    upload.style.display = "none";
-    generateBtn.style.display = "none";
-
-    roastText.textContent = "Roasting...";
-    card.style.display = "block";
-
-    const roast = await getRoast();
-    roastText.textContent = roast;
-
-    shareBtn.style.display = "block";
-    downloadBtn.style.display = "block";
-    videoBtn.style.display = "block";
-  });
-
-  async function generateCanvas() {
-    await new Promise(r => setTimeout(r, 400));
-    const rect = card.getBoundingClientRect();
-    return html2canvas(card, {
-      backgroundColor: "#0b0b0f",
-      scale: 4,
-      width: rect.width,
-      height: rect.height,
-      useCORS: true
-    });
+  async function createImage() {
+    const canvas = await html2canvas(card, { scale: 4 });
+    return new Promise(resolve =>
+      canvas.toBlob(b => resolve(b), "image/png")
+    );
   }
 
-  function downloadImage(src) {
-    const link = document.createElement("a");
-    link.href = src;
-    link.download = "pawspace-roast.png";
-    link.click();
-  }
+  downloadImageBtn.onclick = async () => {
+    lastImageBlob = await createImage();
+    downloadBlob(lastImageBlob, "pawspace-image.png");
+  };
 
-  shareBtn.addEventListener("click", async () => {
-    const canvas = await generateCanvas();
-    canvas.toBlob(async blob => {
-      const file = new File([blob], "pawspace-roast.png", { type: "image/png" });
-
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: "Roast my pet 😈",
-          text: "Roast your pet → pawspace.vercel.app"
-        });
-      } else {
-        downloadImage(canvas.toDataURL("image/png", 1.0));
-      }
-    });
-  });
-
-  downloadBtn.addEventListener("click", async () => {
-    const canvas = await generateCanvas();
-    downloadImage(canvas.toDataURL("image/png", 1.0));
-  });
-
-  /* ---------- VIDEO CREATION ---------- */
-  videoBtn.addEventListener("click", async () => {
-    alert("Creating video… please wait ⏳");
-
+  addVideoBtn.onclick = async () => {
     roastText.style.opacity = 0;
-
     const stream = card.captureStream(30);
-    const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+    const recorder = new MediaRecorder(stream);
     const chunks = [];
 
     recorder.ondataavailable = e => chunks.push(e.data);
     recorder.start();
 
-    setTimeout(() => roastText.style.opacity = 1, 1500);
+    setTimeout(() => roastText.style.opacity = 1, 1200);
     setTimeout(() => recorder.stop(), 7000);
 
-    recorder.onstop = async () => {
-      const blob = new Blob(chunks, { type: "video/webm" });
-      const file = new File([blob], "pawspace-roast-video.webm", { type: "video/webm" });
-
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: "Roast my pet 😈",
-          text: "Roast your pet → pawspace.vercel.app"
-        });
-      } else {
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "pawspace-roast-video.webm";
-        link.click();
-      }
+    recorder.onstop = () => {
+      lastVideoBlob = new Blob(chunks, { type: "video/webm" });
+      alert("Video ready 🎥");
     };
-  });
+  };
+
+  downloadVideoBtn.onclick = () => {
+    if (!lastVideoBlob) return alert("Create video first");
+    downloadBlob(lastVideoBlob, "pawspace-video.webm");
+  };
+
+  shareBtn.onclick = async () => {
+    const blob = lastVideoBlob || lastImageBlob || await createImage();
+    const file = new File([blob],
+      blob.type.includes("video") ? "pawspace-video.webm" : "pawspace-image.png",
+      { type: blob.type }
+    );
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: "Roast my pet 😈",
+        text: "Roast your pet → pawspace.vercel.app"
+      });
+    } else {
+      downloadBlob(blob, file.name);
+    }
+  };
+
+  function downloadBlob(blob, name) {
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = name;
+    link.click();
+  }
 </script>
 </body>
 </html>
