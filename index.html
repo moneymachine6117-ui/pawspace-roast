@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>PawSpace AI Roast</title>
+<title>PawSpace</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -30,19 +30,13 @@ body {
 
 /* LOGO */
 .logo {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 800;
   margin-bottom: 18px;
 }
 
-.logo span {
-  opacity: 0.5;
-  font-weight: 600;
-}
-
-/* CARD */
+/* PHOTO AREA */
 .card {
-  display: none;
   background: linear-gradient(180deg, #181822, #0b0b0f);
   border-radius: 26px;
   overflow: hidden;
@@ -52,12 +46,18 @@ body {
 .image {
   aspect-ratio: 1 / 1;
   background: #1a1a25;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #777;
+  font-size: 14px;
 }
 
 .image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: none;
 }
 
 .content {
@@ -68,6 +68,7 @@ body {
   font-size: 22px;
   font-weight: 800;
   line-height: 1.25;
+  min-height: 56px;
   opacity: 0;
   transition: opacity .4s ease;
 }
@@ -80,16 +81,14 @@ body {
 
 /* ACTIONS */
 .actions {
-  display: none;
   margin-top: 14px;
   display: flex;
-  justify-content: space-between;
   gap: 8px;
 }
 
 .actions button {
   flex: 1;
-  padding: 12px 0;
+  padding: 14px 0;
   border-radius: 14px;
   background: #151520;
   border: 1px solid #2a2a38;
@@ -138,28 +137,28 @@ input[type=file] { display: none; }
 <div class="app">
 
   <!-- LOGO -->
-  <div class="logo">🐾 PawSpace <span>AI Roast</span></div>
+  <div class="logo">🐾 PawSpace</div>
 
   <!-- UPLOAD -->
   <input type="file" id="upload" accept="image/*">
 
-  <!-- CARD -->
+  <!-- PHOTO AREA -->
   <div class="card" id="card">
-    <div class="image">
+    <div class="image" id="imageBox">
+      Upload a pet photo
       <img id="petImage">
     </div>
     <div class="content">
       <div class="roast" id="roastText"></div>
-      <div class="watermark">pawspace.app · Roast your pet</div>
+      <div class="watermark">pawspace.app</div>
     </div>
   </div>
 
   <!-- ACTIONS -->
-  <div class="actions" id="actions">
-    <button id="addVideo">🎥</button>
-    <button id="share" class="primary">🔗</button>
-    <button id="downloadImage">⬇🖼</button>
-    <button id="downloadVideo">⬇🎥</button>
+  <div class="actions">
+    <button id="share" class="primary">Share</button>
+    <button id="downloadImage">⬇ Image</button>
+    <button id="downloadVideo">⬇ Video</button>
   </div>
 
   <!-- UPLOAD BUTTON -->
@@ -167,7 +166,7 @@ input[type=file] { display: none; }
 
   <!-- FOOTER -->
   <div class="footer">
-    Powered by PawSpace AI<br>
+    Powered by PawSpace<br>
     For entertainment only · Content moderated
   </div>
 
