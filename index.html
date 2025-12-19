@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PawSpace</title>
 
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 <style>
 * { box-sizing: border-box; }
 
@@ -56,6 +58,14 @@ body {
   display: none;
 }
 
+.watermark {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
 .roast {
   padding: 16px;
   font-size: 20px;
@@ -79,15 +89,18 @@ button {
   color: black;
 }
 
+.secondary {
+  background: #222;
+  color: white;
+}
+
 .footer {
   margin-top: 20px;
   font-size: 12px;
   opacity: 0.6;
 }
 
-input[type=file] {
-  display: none;
-}
+input[type=file] { display: none; }
 </style>
 </head>
 
@@ -96,20 +109,24 @@ input[type=file] {
 <div class="app">
   <div class="logo">🐾 PawSpace</div>
 
-  <div class="card">
+  <div class="card" id="card">
     <div class="image-box" id="imageBox">
       <span id="placeholder">Upload a pet photo</span>
       <img id="petImage">
+      <div class="watermark">pawspace.app</div>
     </div>
     <div class="roast" id="roastText">Waiting for photo…</div>
   </div>
 
   <input type="file" id="fileInput" accept="image/*">
+
   <button class="primary" id="uploadBtn">Upload Photo</button>
+  <button class="secondary" id="downloadBtn">Download Image</button>
+  <button class="secondary" id="shareBtn">Share</button>
 
   <div class="footer">
     Powered by PawSpace<br>
-    For entertainment only
+    For entertainment only · Content moderated
   </div>
 </div>
 
@@ -121,35 +138,79 @@ const fileInput = document.getElementById("fileInput");
 const petImage = document.getElementById("petImage");
 const placeholder = document.getElementById("placeholder");
 const roastText = document.getElementById("roastText");
+const downloadBtn = document.getElementById("downloadBtn");
+const shareBtn = document.getElementById("shareBtn");
+const card = document.getElementById("card");
+
+let imageBlob = null;
 
 const roasts = [
   "No thoughts. Just audacity.",
   "Runs entirely on vibes.",
   "A menace wrapped in fur.",
   "Confidence greater than intelligence.",
-  "Main character energy. Zero awareness."
+  "Main character energy. Zero awareness.",
+  "This one would survive zero days in the wild.",
+  "Absolutely plotting something illegal."
 ];
 
-uploadBtn.onclick = () => {
-  console.log("Upload button clicked");
-  fileInput.click();
-};
+uploadBtn.onclick = () => fileInput.click();
 
 fileInput.onchange = () => {
   const file = fileInput.files[0];
   if (!file) return;
-
-  console.log("File selected:", file.name);
 
   petImage.onload = () => {
     petImage.style.display = "block";
     placeholder.style.display = "none";
     roastText.textContent =
       roasts[Math.floor(Math.random() * roasts.length)];
-    console.log("Image loaded successfully");
+    imageBlob = null; // reset cache
   };
 
   petImage.src = URL.createObjectURL(file);
+};
+
+/* IMAGE GENERATION */
+async function renderImage() {
+  if (imageBlob) return imageBlob;
+
+  const canvas = await html2canvas(card, {
+    scale: 3,
+    backgroundColor: "#151520"
+  });
+
+  return new Promise(resolve => {
+    canvas.toBlob(blob => {
+      imageBlob = blob;
+      resolve(blob);
+    }, "image/png", 1);
+  });
+}
+
+/* DOWNLOAD */
+downloadBtn.onclick = async () => {
+  const blob = await renderImage();
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "pawspace-roast.png";
+  a.click();
+};
+
+/* SHARE */
+shareBtn.onclick = async () => {
+  const blob = await renderImage();
+  const file = new File([blob], "pawspace.png", { type: "image/png" });
+
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    navigator.share({
+      files: [file],
+      title: "PawSpace",
+      text: "Roast your pet 🐾 pawspace.app"
+    });
+  } else {
+    alert("Sharing not supported. Please download instead.");
+  }
 };
 </script>
 
