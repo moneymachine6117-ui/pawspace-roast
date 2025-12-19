@@ -1,131 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PawSpace</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PawSpace – Roast Your Pet</title>
 
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-<style>
-body {
-  margin: 0;
-  background: #0b0b0f;
-  color: white;
-  font-family: system-ui, sans-serif;
-  display: flex;
-  justify-content: center;
-  min-height: 100vh;
-}
+  <style>
+    body {
+      font-family: Inter, system-ui, sans-serif;
+      background: #f6f7f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+    }
 
-.app {
-  width: 100%;
-  max-width: 420px;
-  padding: 20px;
-  text-align: center;
-}
+    .app {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+    }
 
-.logo {
-  font-size: 32px;
-  font-weight: 900;
-  margin-bottom: 20px;
-}
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
 
-.card {
-  background: #151520;
-  border-radius: 22px;
-  overflow: hidden;
-}
+    .logo {
+      text-align: center;
+      font-weight: 800;
+      font-size: 28px;
+    }
 
-.image-box {
-  aspect-ratio: 1 / 1;
-  background: #222;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+      margin-top: 16px;
+      text-align: center;
+    }
 
-.image-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: none;
-}
+    #petImage {
+      width: 100%;
+      border-radius: 12px;
+      display: none;
+    }
 
-.placeholder {
-  color: #777;
-}
+    #placeholder {
+      padding: 40px 0;
+      color: #888;
+    }
 
-.watermark {
-  position: absolute;
-  bottom: 8px;
-  right: 10px;
-  font-size: 11px;
-  opacity: 0.6;
-}
+    #roastText {
+      margin-top: 12px;
+      font-size: 18px;
+      font-weight: 600;
+    }
 
-.roast {
-  padding: 18px;
-  font-size: 20px;
-  font-weight: 700;
-  min-height: 52px;
-}
+    .watermark {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #777;
+    }
 
-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 12px;
-  border-radius: 16px;
-  border: none;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-}
+    .buttons {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
 
-.primary {
-  background: white;
-  color: black;
-}
+    button {
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
 
-.secondary {
-  background: #222;
-  color: white;
-}
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
-button:disabled {
-  opacity: 0.4;
-}
+    .primary {
+      background: #000;
+      color: #fff;
+    }
 
-input[type=file] {
-  display: none;
-}
-</style>
+    .secondary {
+      background: #eaeaea;
+    }
+
+    footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+    }
+  </style>
 </head>
 
 <body>
+  <div class="app">
+    <div class="logo">🐾 PawSpace</div>
 
-<div class="app">
-  <div class="logo">🐾 PawSpace</div>
-
-  <div class="card" id="card">
-    <div class="image-box">
-      <div class="placeholder" id="placeholder">Upload a pet photo</div>
-      <img id="petImage">
-      <div class="watermark">pawspace.app</div>
+    <div class="card" id="card">
+      <img id="petImage" />
+      <div id="placeholder">Upload a pet photo</div>
+      <div id="roastText"></div>
+      <div class="watermark">
+        Roasted on PawSpace 🐾<br />
+        pawspace.vercel.app
+      </div>
     </div>
-    <div class="roast" id="roastText">Waiting for photo…</div>
+
+    <div class="buttons">
+      <input type="file" id="fileInput" accept="image/*" hidden />
+
+      <button class="primary" id="uploadBtn">Upload Photo</button>
+      <button class="secondary" id="roastBtn" disabled>🔥 Roast Pet</button>
+      <button class="secondary" id="downloadBtn" disabled>⬇ Download</button>
+      <button class="secondary" id="shareBtn" disabled>📤 Share</button>
+      <button class="secondary" id="againBtn" disabled>🐾 Roast Another Pet</button>
+    </div>
+
+    <footer>
+      Powered by PawSpace
+    </footer>
   </div>
 
-  <input type="file" id="fileInput" accept="image/*">
-
-<button class="primary" id="uploadBtn">Upload Photo</button>
-<button class="secondary" id="roastBtn" disabled>🔥 Generate AI Roast</button>
-<button class="secondary" id="downloadBtn" disabled>⬇ Download</button>
-<button class="secondary" id="shareBtn" disabled>📤 Share</button>
-
-</div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

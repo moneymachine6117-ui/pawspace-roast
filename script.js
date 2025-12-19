@@ -2,6 +2,7 @@ const uploadBtn = document.getElementById("uploadBtn");
 const roastBtn = document.getElementById("roastBtn");
 const downloadBtn = document.getElementById("downloadBtn");
 const shareBtn = document.getElementById("shareBtn");
+const againBtn = document.getElementById("againBtn");
 
 const fileInput = document.getElementById("fileInput");
 const petImage = document.getElementById("petImage");
@@ -19,52 +20,40 @@ const FALLBACK_ROASTS = [
 
 let roastHandler = null;
 
-/* =====================
-   UPLOAD IMAGE
-===================== */
+/* UPLOAD */
+uploadBtn.onclick = () => fileInput.click();
 
-uploadBtn.addEventListener("click", () => {
-  fileInput.click();
-});
-
-fileInput.addEventListener("change", () => {
+fileInput.onchange = () => {
   const file = fileInput.files[0];
   if (!file) return;
 
   petImage.onload = () => {
     petImage.style.display = "block";
     placeholder.style.display = "none";
-
     roastText.textContent = "Ready to roast 🔥";
 
     roastBtn.disabled = false;
-    roastBtn.textContent = "🔥 Roast Pet";
     downloadBtn.disabled = true;
     shareBtn.disabled = true;
+    againBtn.disabled = true;
 
-    // Remove old roast handler if exists
+    roastBtn.textContent = "🔥 Roast Pet";
+
     if (roastHandler) {
       roastBtn.removeEventListener("click", roastHandler);
     }
 
-    // Create ONE-TIME roast handler
     roastHandler = async () => {
       roastBtn.disabled = true;
       roastBtn.textContent = "Roast Generated ✓";
       roastText.textContent = "Roasting with AI… 😈";
 
-      // HARD REMOVE HANDLER (NO RE-ROAST)
       roastBtn.removeEventListener("click", roastHandler);
 
       try {
         const res = await fetch("/api/roast", { method: "POST" });
         const data = await res.json();
-
-        if (data && data.roast) {
-          roastText.textContent = data.roast;
-        } else {
-          throw new Error();
-        }
+        roastText.textContent = data.roast || FALLBACK_ROASTS[0];
       } catch {
         roastText.textContent =
           FALLBACK_ROASTS[Math.floor(Math.random() * FALLBACK_ROASTS.length)];
@@ -72,48 +61,31 @@ fileInput.addEventListener("change", () => {
 
       downloadBtn.disabled = false;
       shareBtn.disabled = false;
+      againBtn.disabled = false;
     };
 
     roastBtn.addEventListener("click", roastHandler);
   };
 
   petImage.src = URL.createObjectURL(file);
-});
+};
 
-/* =====================
-   DOWNLOAD IMAGE
-===================== */
+/* DOWNLOAD */
+downloadBtn.onclick = async () => {
+  const canvas = await html2canvas(card, { scale: 3 });
+  const a = document.createElement("a");
+  a.href = canvas.toDataURL("image/png");
+  a.download = "pawspace-roast.png";
+  a.click();
+};
 
-downloadBtn.addEventListener("click", async () => {
-  const canvas = await html2canvas(card, {
-    scale: 3,
-    backgroundColor: "#ffffff"
-  });
-
-  canvas.toBlob(blob => {
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "pawspace-roast.png";
-    a.click();
-  });
-});
-
-/* =====================
-   SHARE (INSTAGRAM / TIKTOK)
-===================== */
-
-shareBtn.addEventListener("click", async () => {
-  const canvas = await html2canvas(card, {
-    scale: 3,
-    backgroundColor: "#ffffff"
-  });
+/* SHARE */
+shareBtn.onclick = async () => {
+  const canvas = await html2canvas(card, { scale: 3 });
 
   canvas.toBlob(async blob => {
-    const file = new File([blob], "pawspace-roast.png", {
-      type: "image/png"
-    });
+    const file = new File([blob], "pawspace-roast.png", { type: "image/png" });
 
-    // MOBILE SHARE (Instagram / TikTok)
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({
@@ -122,15 +94,25 @@ shareBtn.addEventListener("click", async () => {
           text: "I roasted my pet on PawSpace 🐾🔥"
         });
         return;
-      } catch (e) {
-        // fallback to download
-      }
+      } catch {}
     }
 
-    // FALLBACK — DOWNLOAD
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "pawspace-roast.png";
     a.click();
   });
-});
+};
+
+/* UPLOAD AGAIN */
+againBtn.onclick = () => {
+  fileInput.value = "";
+  petImage.style.display = "none";
+  placeholder.style.display = "block";
+  roastText.textContent = "";
+
+  roastBtn.disabled = true;
+  downloadBtn.disabled = true;
+  shareBtn.disabled = true;
+  againBtn.disabled = true;
+};
