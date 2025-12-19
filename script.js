@@ -1,6 +1,8 @@
 const uploadBtn = document.getElementById("uploadBtn");
 const roastBtn = document.getElementById("roastBtn");
 const gifBtn = document.getElementById("gifBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const shareBtn = document.getElementById("shareBtn");
 const againBtn = document.getElementById("againBtn");
 
 const fileInput = document.getElementById("fileInput");
@@ -24,12 +26,14 @@ counterEl.textContent = `🔥 ${roastCount} pets roasted`;
 
 let roastUsed = false;
 
-/* 🔁 RESET FUNCTION (CRITICAL FIX) */
+/* 🔁 RESET (CRITICAL) */
 function resetUI() {
   roastUsed = false;
 
   roastBtn.disabled = true;
   gifBtn.disabled = true;
+  downloadBtn.disabled = true;
+  shareBtn.disabled = true;
   againBtn.disabled = true;
 
   roastBtn.textContent = "🔥 Roast Pet";
@@ -72,10 +76,46 @@ roastBtn.onclick = () => {
   counterEl.textContent = `🔥 ${roastCount} pets roasted`;
 
   gifBtn.disabled = false;
+  downloadBtn.disabled = false;
+  shareBtn.disabled = false;
   againBtn.disabled = false;
 };
 
-/* GIF MEME (RELIABLE METHOD) */
+/* DOWNLOAD IMAGE */
+downloadBtn.onclick = async () => {
+  const canvas = await html2canvas(card, { scale: 3 });
+  const a = document.createElement("a");
+  a.href = canvas.toDataURL("image/png");
+  a.download = "pawspace-roast.png";
+  a.click();
+};
+
+/* SHARE */
+shareBtn.onclick = async () => {
+  const canvas = await html2canvas(card, { scale: 3 });
+
+  canvas.toBlob(async blob => {
+    const file = new File([blob], "pawspace-roast.png", { type: "image/png" });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Roast My Pet 😂",
+          text: "I roasted my pet on PawSpace 🐾🔥"
+        });
+        return;
+      } catch {}
+    }
+
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "pawspace-roast.png";
+    a.click();
+  });
+};
+
+/* GIF MEME */
 gifBtn.onclick = async () => {
   gifBtn.disabled = true;
   gifBtn.textContent = "Generating…";
@@ -118,6 +158,5 @@ againBtn.onclick = () => {
   fileInput.value = "";
   petImage.style.display = "none";
   placeholder.style.display = "block";
-
   resetUI();
 };
