@@ -8,12 +8,15 @@ const placeholder = document.getElementById("placeholder");
 const roastText = document.getElementById("roastText");
 const card = document.getElementById("card");
 
-const ROASTS = [
+let imageReady = false;
+let roastedAlready = false;
+
+const FALLBACK_ROASTS = [
   "No thoughts. Just audacity.",
-  "This pet is definitely plotting something.",
+  "This pet is absolutely planning something illegal.",
   "Confidence higher than intelligence.",
-  "A menace wrapped in cuteness.",
-  "Absolutely zero remorse in those eyes."
+  "A menace disguised as something cute.",
+  "Zero remorse. Pure chaos."
 ];
 
 uploadBtn.onclick = () => fileInput.click();
@@ -28,23 +31,35 @@ fileInput.onchange = () => {
     roastText.textContent = "Ready to roast 🔥";
     roastBtn.disabled = false;
     downloadBtn.disabled = true;
+
+    imageReady = true;
+    roastedAlready = false; // 🔁 reset per upload
   };
 
   petImage.src = URL.createObjectURL(file);
 };
 
-roastBtn.onclick = () => {
-  roastText.textContent =
-    ROASTS[Math.floor(Math.random() * ROASTS.length)];
-  downloadBtn.disabled = false;
-};
+roastBtn.onclick = async () => {
+  if (!imageReady || roastedAlready) return;
 
-downloadBtn.onclick = async () => {
-  const canvas = await html2canvas(card, { scale: 3 });
-  canvas.toBlob(blob => {
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "pawspace-roast.png";
-    a.click();
-  });
+  roastedAlready = true;
+  roastBtn.textContent = "Roast Generated ✓";
+  roastBtn.disabled = true;
+  roastText.textContent = "Roasting with AI… 😈";
+
+  try {
+    const res = await fetch("/api/roast", { method: "POST" });
+    const data = await res.json();
+
+    if (data.roast) {
+      roastText.textContent = data.roast;
+    } else {
+      throw new Error("No roast");
+    }
+  } catch (err) {
+    roastText.textContent =
+      FALLBACK_ROASTS[Math.floor(Math.random() * FALLBACK_ROASTS.length)];
+  }
+
+  downloadBtn.disabled = false;
 };
