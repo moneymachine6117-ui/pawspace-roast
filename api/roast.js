@@ -1,144 +1,145 @@
-<script>
-  /* ---------- ELEMENTS ---------- */
-  const upload = document.getElementById("upload");
-  const petImage = document.getElementById("petImage");
-  const card = document.getElementById("card");
-  const roastText = document.getElementById("roastText");
-  const actions = document.getElementById("actions");
+const $ = id => document.getElementById(id);
 
-  const addImageBtn = document.getElementById("addImage");
-  const addVideoBtn = document.getElementById("addVideo");
-  const shareBtn = document.getElementById("share");
-  const downloadImageBtn = document.getElementById("downloadImage");
-  const downloadVideoBtn = document.getElementById("downloadVideo");
+const upload = $("upload");
+const uploadBtn = $("uploadBtn");
+const petImage = $("petImage");
+const card = $("card");
+const roastText = $("roastText");
+const actions = $("actions");
 
-  /* ---------- STATE ---------- */
-  let imageLoaded = false;
-  let lastImageBlob = null;
-  let lastVideoBlob = null;
+const btnAddVideo = $("addVideo");
+const btnShare = $("share");
+const btnDownloadImage = $("downloadImage");
+const btnDownloadVideo = $("downloadVideo");
 
-  const fallbackRoasts = [
-    "Zero thoughts. Unlimited confidence.",
-    "Acts surprised by consequences it caused.",
-    "Main character energy. Side character intelligence.",
-    "Runs entirely on delusion.",
-    "A menace with no strategy."
-  ];
+const state = {
+  imageReady: false,
+  imageBlob: null,
+  videoBlob: null,
+  busy: false
+};
 
-  /* ---------- IMAGE UPLOAD ---------- */
-  addImageBtn.onclick = () => upload.click();
+const fallbackRoasts = [
+  "No thoughts. Just audacity.",
+  "Runs entirely on vibes.",
+  "A menace wrapped in fur.",
+  "Confidence greater than intelligence.",
+  "Main character energy. Zero awareness."
+];
 
-  upload.onchange = () => {
-    const file = upload.files[0];
-    if (!file) return;
+uploadBtn.onclick = () => upload.click();
 
-    petImage.onload = () => {
-      imageLoaded = true;
-      generateRoast();
-    };
+upload.onchange = () => {
+  const file = upload.files[0];
+  if (!file) return;
 
-    petImage.src = URL.createObjectURL(file);
-  };
+  resetState();
 
-  /* ---------- ROAST ---------- */
-  async function generateRoast() {
+  petImage.onload = async () => {
+    state.imageReady = true;
     card.style.display = "block";
     actions.style.display = "flex";
-    roastText.textContent = "Roasting...";
+    await generateRoast();
+  };
 
-    lastVideoBlob = null; // reset video on new image
+  petImage.src = URL.createObjectURL(file);
+};
 
-    try {
-      const res = await fetch("/api/roast", { method: "POST" });
-      const data = await res.json();
-      roastText.textContent = data.roast;
-    } catch {
-      roastText.textContent =
-        fallbackRoasts[Math.floor(Math.random() * fallbackRoasts.length)];
-    }
+async function generateRoast() {
+  setBusy(true, "Roasting…");
+
+  try {
+    const res = await fetch("/api/roast", { method: "POST" });
+    const data = await res.json();
+    roastText.textContent = data.roast;
+  } catch {
+    roastText.textContent =
+      fallbackRoasts[Math.floor(Math.random() * fallbackRoasts.length)];
   }
 
-  /* ---------- IMAGE GENERATION (UHD) ---------- */
-  async function createImageBlob() {
-    const canvas = await html2canvas(card, {
-      scale: 4,
-      backgroundColor: "#0b0b0f",
-      useCORS: true
+  requestAnimationFrame(() => roastText.style.opacity = 1);
+  setBusy(false);
+}
+
+btnAddVideo.onclick = async () => {
+  if (!state.imageReady || state.busy) return;
+
+  setBusy(true, "Creating video…");
+  roastText.style.opacity = 0;
+
+  const stream = card.captureStream(30);
+  const recorder = new MediaRecorder(stream);
+  const chunks = [];
+
+  recorder.ondataavailable = e => chunks.push(e.data);
+  recorder.start();
+
+  setTimeout(() => roastText.style.opacity = 1, 1200);
+  setTimeout(() => recorder.stop(), 7000);
+
+  recorder.onstop = () => {
+    state.videoBlob = new Blob(chunks, { type: "video/webm" });
+    setBusy(false);
+  };
+};
+
+btnDownloadImage.onclick = async () => {
+  const blob = await renderImage();
+  download(blob, "pawspace-roast.png");
+};
+
+btnDownloadVideo.onclick = () => {
+  if (!state.videoBlob) return;
+  download(state.videoBlob, "pawspace-video.webm");
+};
+
+btnShare.onclick = async () => {
+  let blob = state.videoBlob || state.imageBlob || await renderImage();
+  const file = new File([blob], "pawspace-share", { type: blob.type });
+
+  if (navigator.canShare?.({ files: [file] })) {
+    await navigator.share({
+      files: [file],
+      title: "Roast my pet 😈",
+      text: "pawspace.app"
     });
-
-    return new Promise(resolve =>
-      canvas.toBlob(blob => resolve(blob), "image/png", 1.0)
-    );
+  } else {
+    download(blob, "pawspace-share");
   }
+};
 
-  /* ---------- DOWNLOAD IMAGE ---------- */
-  downloadImageBtn.onclick = async () => {
-    if (!imageLoaded) return alert("Upload an image first");
-    lastImageBlob = await createImageBlob();
-    downloadBlob(lastImageBlob, "pawspace-roast.png");
-  };
+async function renderImage() {
+  if (state.imageBlob) return state.imageBlob;
 
-  /* ---------- VIDEO CREATION ---------- */
-  addVideoBtn.onclick = async () => {
-    if (!imageLoaded) return alert("Upload an image first");
+  const canvas = await html2canvas(card, {
+    scale: 4,
+    backgroundColor: "#0b0b0f"
+  });
 
-    alert("Creating video… ⏳");
+  return new Promise(resolve => {
+    canvas.toBlob(b => {
+      state.imageBlob = b;
+      resolve(b);
+    }, "image/png", 1);
+  });
+}
 
-    roastText.style.opacity = 0;
+function setBusy(flag, text) {
+  state.busy = flag;
+  roastText.textContent = text;
+  [btnAddVideo, btnShare, btnDownloadImage, btnDownloadVideo]
+    .forEach(b => b.disabled = flag);
+}
 
-    const stream = card.captureStream(30);
-    const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
-    const chunks = [];
+function resetState() {
+  state.imageBlob = null;
+  state.videoBlob = null;
+  roastText.style.opacity = 0;
+}
 
-    recorder.ondataavailable = e => chunks.push(e.data);
-    recorder.start();
-
-    setTimeout(() => roastText.style.opacity = 1, 1200);
-    setTimeout(() => recorder.stop(), 7000);
-
-    recorder.onstop = () => {
-      lastVideoBlob = new Blob(chunks, { type: "video/webm" });
-      alert("Video ready 🎥");
-    };
-  };
-
-  /* ---------- DOWNLOAD VIDEO ---------- */
-  downloadVideoBtn.onclick = () => {
-    if (!lastVideoBlob) return alert("Create a video first");
-    downloadBlob(lastVideoBlob, "pawspace-roast-video.webm");
-  };
-
-  /* ---------- SHARE (IMAGE OR VIDEO) ---------- */
-  shareBtn.onclick = async () => {
-    let blob = lastVideoBlob || lastImageBlob;
-
-    if (!blob) {
-      blob = await createImageBlob();
-      lastImageBlob = blob;
-    }
-
-    const fileName = blob.type.includes("video")
-      ? "pawspace-roast-video.webm"
-      : "pawspace-roast.png";
-
-    const file = new File([blob], fileName, { type: blob.type });
-
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({
-        files: [file],
-        title: "Roast my pet 😈",
-        text: "Roast your pet → pawspace.vercel.app"
-      });
-    } else {
-      downloadBlob(blob, fileName);
-    }
-  };
-
-  /* ---------- UTIL ---------- */
-  function downloadBlob(blob, name) {
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = name;
-    link.click();
-  }
-</script>
+function download(blob, name) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+}

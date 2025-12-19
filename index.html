@@ -5,20 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>PawSpace AI Roast</title>
 
-<meta name="description" content="Upload your pet. Get a ruthless AI roast. Share instantly." />
-<meta name="theme-color" content="#0b0b0f">
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
-/* ========== BASE ========== */
 * { box-sizing: border-box; }
+
 body {
   margin: 0;
   font-family: Inter, system-ui, sans-serif;
-  background: radial-gradient(900px at top, #14141c, #050507);
-  color: #fff;
+  background: radial-gradient(1000px at top, #14141c, #050507);
+  color: white;
   display: flex;
   justify-content: center;
   min-height: 100vh;
@@ -27,45 +24,33 @@ body {
 .app {
   width: 100%;
   max-width: 420px;
-  padding: 18px 16px 28px;
+  padding: 24px 16px;
+  text-align: center;
 }
 
-/* ========== HEADER ========== */
-.header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin: 10px 0 18px;
-  opacity: .95;
-}
-
-.header .paw {
-  font-size: 20px;
-}
-
-.header .title {
+/* LOGO */
+.logo {
+  font-size: 26px;
   font-weight: 800;
-  letter-spacing: -0.4px;
+  margin-bottom: 18px;
 }
 
-.header .sub {
-  opacity: .5;
+.logo span {
+  opacity: 0.5;
   font-weight: 600;
-  margin-left: 4px;
 }
 
-/* ========== CARD ========== */
+/* CARD */
 .card {
   display: none;
   background: linear-gradient(180deg, #181822, #0b0b0f);
   border-radius: 26px;
   overflow: hidden;
-  box-shadow: 0 40px 80px rgba(0,0,0,.7);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.7);
 }
 
 .image {
-  aspect-ratio: 1/1;
+  aspect-ratio: 1 / 1;
   background: #1a1a25;
 }
 
@@ -88,68 +73,63 @@ body {
 }
 
 .watermark {
-  margin-top: 12px;
+  margin-top: 10px;
   font-size: 11px;
-  opacity: .6;
+  opacity: 0.6;
 }
 
-/* ========== PRIMARY CTA ========== */
-.primary-cta {
-  margin-top: 18px;
-}
-
-.primary-cta button {
-  width: 100%;
-  padding: 16px;
-  border-radius: 18px;
-  border: none;
-  background: #ffffff;
-  color: #000;
-  font-weight: 800;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-/* ========== SECONDARY ACTIONS ========== */
+/* ACTIONS */
 .actions {
   display: none;
   margin-top: 14px;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .actions button {
+  flex: 1;
   padding: 12px 0;
   border-radius: 14px;
   background: #151520;
   border: 1px solid #2a2a38;
-  color: #fff;
-  font-size: 16px;
+  color: white;
+  font-size: 15px;
   cursor: pointer;
 }
 
 .actions button.primary {
-  background: #fff;
-  color: #000;
+  background: white;
+  color: black;
   font-weight: 700;
 }
 
 .actions button:disabled {
   opacity: .4;
-  cursor: not-allowed;
 }
 
-/* ========== FOOTER ========== */
+/* UPLOAD */
+.upload-btn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  border: none;
+  background: white;
+  color: black;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* FOOTER */
 .footer {
   margin-top: 26px;
-  text-align: center;
   font-size: 12px;
   opacity: .55;
   line-height: 1.5;
 }
 
-/* ========== HIDDEN ========== */
 input[type=file] { display: none; }
 </style>
 </head>
@@ -157,15 +137,11 @@ input[type=file] { display: none; }
 <body>
 <div class="app">
 
-  <!-- HEADER -->
-  <div class="header">
-    <div class="paw">🐾</div>
-    <div class="title">PawSpace</div>
-    <div class="sub">AI Roast</div>
-  </div>
+  <!-- LOGO -->
+  <div class="logo">🐾 PawSpace <span>AI Roast</span></div>
 
   <!-- UPLOAD -->
-  <input type="file" id="upload" accept="image/*" />
+  <input type="file" id="upload" accept="image/*">
 
   <!-- CARD -->
   <div class="card" id="card">
@@ -178,18 +154,16 @@ input[type=file] { display: none; }
     </div>
   </div>
 
-  <!-- PRIMARY CTA -->
-  <div class="primary-cta">
-    <button id="uploadBtn">Upload Pet Photo</button>
-  </div>
-
-  <!-- SECONDARY ACTIONS -->
+  <!-- ACTIONS -->
   <div class="actions" id="actions">
     <button id="addVideo">🎥</button>
     <button id="share" class="primary">🔗</button>
     <button id="downloadImage">⬇🖼</button>
     <button id="downloadVideo">⬇🎥</button>
   </div>
+
+  <!-- UPLOAD BUTTON -->
+  <button class="upload-btn" id="uploadBtn">Upload Pet Photo</button>
 
   <!-- FOOTER -->
   <div class="footer">
@@ -199,152 +173,6 @@ input[type=file] { display: none; }
 
 </div>
 
-<script>
-const $ = id => document.getElementById(id);
-
-const upload = $("upload");
-const uploadBtn = $("uploadBtn");
-const petImage = $("petImage");
-const card = $("card");
-const roastText = $("roastText");
-const actions = $("actions");
-
-const btnAddVideo = $("addVideo");
-const btnShare = $("share");
-const btnDownloadImage = $("downloadImage");
-const btnDownloadVideo = $("downloadVideo");
-
-const state = {
-  imageReady: false,
-  imageBlob: null,
-  videoBlob: null,
-  busy: false
-};
-
-const fallbackRoasts = [
-  "No thoughts. Just audacity.",
-  "Runs entirely on vibes.",
-  "A menace wrapped in fur.",
-  "Confidence greater than intelligence.",
-  "Main character. Zero awareness."
-];
-
-uploadBtn.onclick = () => upload.click();
-
-upload.onchange = () => {
-  const file = upload.files[0];
-  if (!file) return;
-
-  reset();
-
-  petImage.onload = async () => {
-    state.imageReady = true;
-    card.style.display = "block";
-    actions.style.display = "grid";
-    await generateRoast();
-  };
-
-  petImage.src = URL.createObjectURL(file);
-};
-
-async function generateRoast() {
-  setBusy(true, "Roasting…");
-
-  try {
-    const res = await fetch("/api/roast", { method: "POST" });
-    const data = await res.json();
-    roastText.textContent = data.roast;
-  } catch {
-    roastText.textContent =
-      fallbackRoasts[Math.floor(Math.random() * fallbackRoasts.length)];
-  }
-
-  requestAnimationFrame(() => roastText.style.opacity = 1);
-  setBusy(false);
-}
-
-btnAddVideo.onclick = async () => {
-  if (!state.imageReady || state.busy) return;
-
-  setBusy(true, "Creating video…");
-  roastText.style.opacity = 0;
-
-  const stream = card.captureStream(30);
-  const recorder = new MediaRecorder(stream);
-  const chunks = [];
-
-  recorder.ondataavailable = e => chunks.push(e.data);
-  recorder.start();
-
-  setTimeout(() => roastText.style.opacity = 1, 1200);
-  setTimeout(() => recorder.stop(), 7000);
-
-  recorder.onstop = () => {
-    state.videoBlob = new Blob(chunks, { type: "video/webm" });
-    setBusy(false);
-  };
-};
-
-btnDownloadImage.onclick = async () => {
-  const blob = await renderImage();
-  download(blob, "pawspace-roast.png");
-};
-
-btnDownloadVideo.onclick = () => {
-  if (!state.videoBlob) return;
-  download(state.videoBlob, "pawspace-video.webm");
-};
-
-btnShare.onclick = async () => {
-  let blob = state.videoBlob || state.imageBlob || await renderImage();
-  const file = new File([blob], "pawspace-share", { type: blob.type });
-
-  if (navigator.canShare?.({ files: [file] })) {
-    await navigator.share({
-      files: [file],
-      title: "Roast my pet 😈",
-      text: "pawspace.app"
-    });
-  } else {
-    download(blob, "pawspace-share");
-  }
-};
-
-async function renderImage() {
-  if (state.imageBlob) return state.imageBlob;
-
-  const canvas = await html2canvas(card, {
-    scale: 4,
-    backgroundColor: "#0b0b0f"
-  });
-
-  return new Promise(resolve => {
-    canvas.toBlob(b => {
-      state.imageBlob = b;
-      resolve(b);
-    }, "image/png", 1);
-  });
-}
-
-function setBusy(flag, text) {
-  state.busy = flag;
-  roastText.textContent = text;
-  [btnAddVideo, btnShare, btnDownloadImage, btnDownloadVideo]
-    .forEach(b => b.disabled = flag);
-}
-
-function reset() {
-  state.imageBlob = null;
-  state.videoBlob = null;
-  roastText.style.opacity = 0;
-}
-
-function download(blob, name) {
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  a.click();
-}
-</script>
+<script src="script.js"></script>
 </body>
 </html>
