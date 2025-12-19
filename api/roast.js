@@ -1,6 +1,4 @@
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).end();
-
   const response = await fetch("https://api.deepseek.com/chat/completions", {
     method: "POST",
     headers: {
@@ -10,8 +8,14 @@ export default async function handler(req, res) {
     body: JSON.stringify({
       model: "deepseek-chat",
       messages: [
-        { role: "system", content: "You roast pets. Savage, short, funny." },
-        { role: "user", content: "Roast this pet." }
+        {
+          role: "system",
+          content: "You roast pets. Savage, funny, viral, short."
+        },
+        {
+          role: "user",
+          content: "Roast this pet."
+        }
       ]
     })
   });

@@ -1,18 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>PawSpace</title>
-<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+body {
+  margin: 0;
+  background: #0b0b0f;
+  color: white;
+  font-family: system-ui, sans-serif;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.app {
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+  text-align: center;
+}
+
+/* LOGO ANIMATION */
+.logo {
+  font-size: 30px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  animation: pop 1.2s ease infinite alternate;
+}
+@keyframes pop {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
+.card {
+  background: #151520;
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.image-box {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.placeholder { color: #777; }
+
+.watermark {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.roast {
+  padding: 18px;
+  font-size: 20px;
+  font-weight: 700;
+  min-height: 60px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  border-radius: 16px;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary { background: white; color: black; }
+.secondary { background: #222; color: white; }
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.footer {
+  margin-top: 22px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+input[type=file] { display: none; }
+</style>
 </head>
 
 <body>
 <div class="app">
+
   <div class="logo">🐾 PawSpace</div>
-  <div id="feed"></div>
+
+  <div class="card" id="card">
+    <div class="image-box">
+      <div class="placeholder" id="placeholder">Upload a pet photo</div>
+      <img id="petImage" />
+      <div class="watermark">pawspace.app</div>
+    </div>
+    <div class="roast" id="roastText">Waiting for photo…</div>
+  </div>
+
+  <input type="file" id="fileInput" accept="image/*" />
+
+  <button class="primary" id="uploadBtn">Upload Photo</button>
+  <button class="secondary" id="roastBtn" disabled>🔥 Generate Roast</button>
+  <button class="secondary" id="downloadBtn" disabled>⬇ Download</button>
+  <button class="secondary" id="shareBtn" disabled>📤 Share</button>
+
+  <div class="footer">
+    Powered by PawSpace<br />
+    For entertainment only
+  </div>
 </div>
 
-<script src="app.js" defer></script>
+<script src="app.js"></script>
 </body>
 </html>

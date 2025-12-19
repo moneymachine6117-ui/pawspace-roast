@@ -1,52 +1,75 @@
-console.log("app.js loaded");
+const uploadBtn = document.getElementById("uploadBtn");
+const roastBtn = document.getElementById("roastBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const shareBtn = document.getElementById("shareBtn");
 
-async function loadFeed() {
-  const res = await fetch("/api/feed");
-  const posts = await res.json();
-  const feed = document.getElementById("feed");
-  if (!feed) return;
+const fileInput = document.getElementById("fileInput");
+const petImage = document.getElementById("petImage");
+const placeholder = document.getElementById("placeholder");
+const roastText = document.getElementById("roastText");
+const card = document.getElementById("card");
 
-  posts.forEach(p => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <img src="${p.image}">
-      <div class="content">
-        <strong>@${p.petName}</strong>
-        <p>${p.roast}</p>
-        <div class="actions">
-          ❤️ ${p.likes}
-          <a href="profile.html?pet=${p.petName}">Profile</a>
-        </div>
-      </div>
-    `;
-    feed.appendChild(card);
+let imageReady = false;
+
+/* Upload */
+uploadBtn.onclick = () => fileInput.click();
+
+fileInput.onchange = () => {
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  petImage.onload = () => {
+    petImage.style.display = "block";
+    placeholder.style.display = "none";
+    roastText.textContent = "Ready to roast 🔥";
+    roastBtn.disabled = false;
+    downloadBtn.disabled = true;
+    shareBtn.disabled = true;
+    imageReady = true;
+  };
+
+  petImage.src = URL.createObjectURL(file);
+};
+
+/* AI Roast */
+roastBtn.onclick = async () => {
+  if (!imageReady) return;
+
+  roastText.textContent = "Roasting… 😈";
+
+  const res = await fetch("/api/roast", { method: "POST" });
+  const data = await res.json();
+
+  roastText.textContent = data.roast;
+  downloadBtn.disabled = false;
+  shareBtn.disabled = false;
+};
+
+/* Download */
+downloadBtn.onclick = async () => {
+  const canvas = await html2canvas(card, { scale: 3 });
+  canvas.toBlob(blob => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "pawspace-roast.png";
+    a.click();
   });
-}
+};
 
-async function loadProfile() {
-  const params = new URLSearchParams(location.search);
-  const pet = params.get("pet");
-  if (!pet) return;
+/* Share */
+shareBtn.onclick = async () => {
+  const canvas = await html2canvas(card, { scale: 2 });
+  canvas.toBlob(async blob => {
+    const file = new File([blob], "pawspace-roast.png", { type: "image/png" });
 
-  document.getElementById("petName").textContent = pet;
-
-  const res = await fetch("/api/feed");
-  const posts = await res.json();
-  const container = document.getElementById("profilePosts");
-
-  posts
-    .filter(p => p.petName === pet)
-    .forEach(p => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <img src="${p.image}">
-        <div class="content">${p.roast}</div>
-      `;
-      container.appendChild(card);
-    });
-}
-
-loadFeed();
-loadProfile();
+    if (navigator.share) {
+      await navigator.share({
+        files: [file],
+        title: "Roast my pet",
+        text: "Roast your pet 👉 pawspace.app"
+      });
+    } else {
+      alert("Sharing not supported on this device");
+    }
+  });
+};
