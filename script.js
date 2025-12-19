@@ -3,6 +3,7 @@ const roastBtn = document.getElementById("roastBtn");
 const downloadBtn = document.getElementById("downloadBtn");
 const shareBtn = document.getElementById("shareBtn");
 const againBtn = document.getElementById("againBtn");
+const counterEl = document.getElementById("counter");
 
 const fileInput = document.getElementById("fileInput");
 const petImage = document.getElementById("petImage");
@@ -17,6 +18,10 @@ const FALLBACK_ROASTS = [
   "A menace disguised as something cute.",
   "Zero remorse. Pure chaos."
 ];
+
+// Fake counter (local, believable)
+let roastCount = parseInt(localStorage.getItem("pawspaceCount") || "27");
+counterEl.textContent = `🔥 ${roastCount} pets roasted`;
 
 let roastHandler = null;
 
@@ -33,11 +38,10 @@ fileInput.onchange = () => {
     roastText.textContent = "Ready to roast 🔥";
 
     roastBtn.disabled = false;
+    roastBtn.textContent = "🔥 Roast Pet";
     downloadBtn.disabled = true;
     shareBtn.disabled = true;
     againBtn.disabled = true;
-
-    roastBtn.textContent = "🔥 Roast Pet";
 
     if (roastHandler) {
       roastBtn.removeEventListener("click", roastHandler);
@@ -46,7 +50,6 @@ fileInput.onchange = () => {
     roastHandler = async () => {
       roastBtn.disabled = true;
       roastBtn.textContent = "Roast Generated ✓";
-      roastText.textContent = "Roasting with AI… 😈";
 
       roastBtn.removeEventListener("click", roastHandler);
 
@@ -58,6 +61,11 @@ fileInput.onchange = () => {
         roastText.textContent =
           FALLBACK_ROASTS[Math.floor(Math.random() * FALLBACK_ROASTS.length)];
       }
+
+      // Increment fake counter
+      roastCount += 1;
+      localStorage.setItem("pawspaceCount", roastCount);
+      counterEl.textContent = `🔥 ${roastCount} pets roasted`;
 
       downloadBtn.disabled = false;
       shareBtn.disabled = false;
