@@ -11,8 +11,6 @@ const btnDownloadImage = $("downloadImage");
 const btnDownloadVideo = $("downloadVideo");
 
 let imageBlob = null;
-let videoBlob = null;
-let imageReady = false;
 
 const roasts = [
   "No thoughts. Just audacity.",
@@ -30,10 +28,8 @@ upload.onchange = () => {
 
   petImage.onload = () => {
     petImage.style.display = "block";
-    imageBox.firstChild.textContent = "";
-    imageReady = true;
+    imageBox.innerHTML = "";
     generateRoast();
-    generateVideo(); // auto-generate for virality
   };
 
   petImage.src = URL.createObjectURL(file);
@@ -45,58 +41,49 @@ function generateRoast() {
   requestAnimationFrame(() => roastText.style.opacity = 1);
 }
 
-/* IMAGE EXPORT */
+/* IMAGE EXPORT — WORKS EVERYWHERE */
 async function renderImage() {
   if (imageBlob) return imageBlob;
-  const canvas = await html2canvas($("card"), { scale: 4 });
-  return new Promise(r => canvas.toBlob(b => (imageBlob = b), "image/png", 1));
+
+  const canvas = await html2canvas($("card"), {
+    scale: 4,
+    backgroundColor: "#0b0b0f",
+    useCORS: true
+  });
+
+  return new Promise(resolve => {
+    canvas.toBlob(blob => {
+      imageBlob = blob;
+      resolve(blob);
+    }, "image/png", 1);
+  });
 }
 
-/* AUTO VIRAL VIDEO */
-function generateVideo() {
-  roastText.style.opacity = 0;
-
-  const stream = $("card").captureStream(30);
-  const recorder = new MediaRecorder(stream);
-  const chunks = [];
-
-  recorder.ondataavailable = e => chunks.push(e.data);
-  recorder.start();
-
-  setTimeout(() => roastText.style.opacity = 1, 900); // hook timing
-  setTimeout(() => recorder.stop(), 6500); // TikTok sweet spot
-
-  recorder.onstop = () => {
-    videoBlob = new Blob(chunks, { type: "video/webm" });
-  };
-}
-
-/* DOWNLOADS */
+/* DOWNLOAD IMAGE */
 btnDownloadImage.onclick = async () => {
-  if (!imageReady) return;
   const blob = await renderImage();
-  download(blob, "pawspace.png");
+  download(blob, "pawspace-roast.png");
 };
 
-btnDownloadVideo.onclick = () => {
-  if (!videoBlob) return;
-  download(videoBlob, "pawspace-reel.webm");
-};
-
-/* SHARE */
+/* SHARE IMAGE */
 btnShare.onclick = async () => {
-  const blob = videoBlob || await renderImage();
-  const file = new File([blob], "pawspace-share", { type: blob.type });
+  const blob = await renderImage();
+  const file = new File([blob], "pawspace.png", { type: "image/png" });
 
   if (navigator.canShare?.({ files: [file] })) {
-    navigator.share({
+    await navigator.share({
       files: [file],
       title: "PawSpace",
       text: "Roast your pet 🐾 pawspace.app"
     });
   } else {
-    download(blob, "pawspace-share");
+    download(blob, "pawspace.png");
   }
+};
+
+/* VIDEO — DISABLED (HONEST UX) */
+btnDownloadVideo.onclick = () => {
+  alert("Video coming soon 🚀");
 };
 
 function download(blob, name) {
